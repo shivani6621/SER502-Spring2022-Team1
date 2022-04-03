@@ -1,2 +1,0 @@
-source runtime files
-input files from tools -> flex,bison
