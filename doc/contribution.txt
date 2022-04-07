@@ -1,0 +1,25 @@
+---------------------------------------------------
+MILESTONE 1:
+---------------------------------------------------
+
+Zhuoran Li:
+1. Design the Grammar rule for the for construct
+2. Design the parsing technique
+
+Zuha Shireen:
+1. Overview of language design
+2. While construct
+
+Shengdong Chen:
+1. Designed "for in each" Grammar
+2. Documentation of Data Structure
+
+Rishav Kumar:
+1. Worked on developing the basic flow of the language and formulating the grammar rules in an abstract form. also, developed complete grammar rules for variable declaration and definition
+2. Collaborated on documenting the language design with Zuha where I tried to present a general overview of the language design (the first part)
+3. Designed the rules for assignment and expressions
+
+Shivani Patil:
+1. Setting up the Git-hub repository.
+2. Designed grammar for "if-else" construct.
+3. Worked on the documentation of Interpreter generation tool (ANTLR) that we are using.
