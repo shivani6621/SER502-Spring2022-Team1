@@ -9,7 +9,7 @@
 ![Screen Shot 2022-04-18 at 22 01 23](https://user-images.githubusercontent.com/89811597/163923579-a99ca861-3f41-4091-81b4-a71b87a374be.png)
 
 3.  Click the "Run" button, you should see the target package like this.
-![Screen Shot 2022-04-18 at 22 01 23](https://user-images.githubusercontent.com/89811597/163923813-c9e8cc4a-c391-48c3-be35-c963c4dc6c63.png)
+![Screen Shot 2022-04-18 at 22 04 19](https://user-images.githubusercontent.com/89811597/163925003-7f7eaadf-0a0b-4e9d-86e5-d0239ff34d12.png)
 
 4. After that you can encode our grammar and use lexer to test.
 ![Screen Shot 2022-04-18 at 22 07 20](https://user-images.githubusercontent.com/89811597/163924077-e14daccd-3ae1-4376-8fda-0214a4d0a633.png)
