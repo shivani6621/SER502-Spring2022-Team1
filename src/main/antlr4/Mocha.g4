@@ -56,7 +56,7 @@ assignment_statement : IDENTIFIER '=' literal;
 ε
 
 <relational_expression> → <expression_term> <relational_operator> <expression_term>
-<relational_operator> → == | < | > | <= | >=
+<relational_operator> → c
 
 <logical_expression> → <expression_term> <logical_operator_binary> <expression_term> |
 <logical_operator_unary> <expression_term>
@@ -75,28 +75,51 @@ assignment_statement : IDENTIFIER '=' literal;
 <if_else_statement> → if <if_condition> \n { \n <statement> \n } \n else \n { \n <statement> \n }
 <if_condition> → <relational_expression> | <logical_expression>*/
 
-if_else_statement: 'if';
+if_else_statement
+                :   'if' '(' if_condition ')' statement ('else' statement)?
+                ;
 
+if_condition: relational_expression;
+
+relational_expression: expression_term (('=='|'!='|'<'|'>'|'<='|'>=')) expression_term;
+
+Less : '<';
+LessEqual : '<=';
+Greater : '>';
+GreaterEqual : '>=';
+Equal : '==';
+NotEqual : '!=';
+
+expression_term: IDENTIFIER
+               | literal
+               ;
 
 
 /*# Grammar rules for the for construct
 <for_statement> → for <for_expression> \n { \n <statement> \n }
 <for_expression> → <identifier> = <digits> to <digits>*/
 
-for_statement: 'for';
+for_statement
+             : 'for' for_expression '{' statement '}'
+             ;
+
+for_expression: IDENTIFIER '=' DIGIT 'to' DIGITS;
 
 
 /*# Grammar rules for the while construct
 <while_statement> → while 	<while_condition> \n { \n <statement> \n }
 <while_condition> → <logical_expression> | <relational_expression>*/
 
-while_statement: 'while';
+while_statement: 'while' while_condition '{' statement '}';
+while_condition: relational_expression;
 
 /*# Grammar rules for the for in range construct
 <for_in_range_statement> → for <identifier> in <range> \n { \n <statement> \n }
 <range> → <digits> , <digits>*/
 
-for_in_range_statement: 'for_in';
+for_in_range_statement: 'for' IDENTIFIER 'In' range '{' statement '}';
+
+range: DIGITS;
 
 /*# Grammar rules for the print construct
 <print_statement> → print <print_argument_list>
