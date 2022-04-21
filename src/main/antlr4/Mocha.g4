@@ -34,7 +34,8 @@ DIGITS : DIGIT+;
 NON_ZERO_DIGIT : [1-9];
 WS : [ \t\r\n]+ -> skip ;
 
-assignment_statement : IDENTIFIER '=' literal;
+assignment_statement : IDENTIFIER '=' literal
+                | IDENTIFIER '=' arithmetic_expression;
 
 /*# Grammar rules for assignment statement and expressions
 <assignment_statement> → <identifier> = <expression>
@@ -75,6 +76,27 @@ assignment_statement : IDENTIFIER '=' literal;
 <if_else_statement> → if <if_condition> \n { \n <statement> \n } \n else \n { \n <statement> \n }
 <if_condition> → <relational_expression> | <logical_expression>*/
 
+// expression
+// left recursion not handled yet
+expression : 
+        arithmetic_expression
+        | relational_expression
+        // | logical_expression
+        // | ternary_expression
+        | expression_term
+        ;
+
+arithmetic_expression : 
+        arithmetic_expression '+' arithmetic_term
+        | arithmetic_expression '-' arithmetic_term
+        | arithmetic_term
+        ;
+arithmetic_term :
+        arithmetic_term '*' expression_term
+        | arithmetic_term '/' expression_term
+        | expression_term
+        ;
+
 if_else_statement
                 :   'if' '(' if_condition ')' statement ('else' statement)?
                 ;
@@ -92,6 +114,7 @@ NotEqual : '!=';
 
 expression_term: IDENTIFIER
                | literal
+               | '(' arithmetic_expression ')'
                ;
 
 

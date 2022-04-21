@@ -1,2 +1,4 @@
-target
+/target/**
 .idea
+.iml
+/src/main/antlr4/.antlr4/**
