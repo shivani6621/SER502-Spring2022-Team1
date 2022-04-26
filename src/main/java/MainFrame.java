@@ -11,8 +11,8 @@ public class MainFrame extends JFrame {
     private static final int DEFAULT_WINDOW_HEIGHT = 500;
     private static final int DEFAULT_WINDOW_WIDTH = 800;
 
-    private JTextArea jTextAreaCodeEditor;
-    private JTextArea jTextAreaProgramOutput;
+    private final JTextArea jTextAreaCodeEditor;
+    private final JTextArea jTextAreaProgramOutput;
 
     public MainFrame(){
         super("Mocha");
@@ -60,6 +60,9 @@ public class MainFrame extends JFrame {
         MochaParser mochaParser = new MochaParser(commonTokenStream);
         ParseTree parseTree = mochaParser.program();
         jTextAreaProgramOutput.setText(parseTree.toStringTree(mochaParser));
+
+        MyMochaVisitor myMochaVisitor = new MyMochaVisitor();
+        myMochaVisitor.visit(parseTree);
 
         // ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
     }

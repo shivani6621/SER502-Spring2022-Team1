@@ -42,7 +42,7 @@ relational_expression : expression_term OP_SET_RELATIONAL expression_term ;
 /* LOGICAL EXPRESSION DEFINITION */
 logical_expression
     : expression_term OP_SET_LOGICAL_BIN expression_term
-    | OP_SET_LOGICAL_uni expression_term ;
+    | OP_SET_LOGICAL_UNI expression_term ;
 
 /* TERNARY EXPRESSION DEFINITION */
 ternary_expression : relational_expression OP_TERNARY_TRUE expression OP_TERNARY_FALSE expression ;
