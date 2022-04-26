@@ -1,157 +1,119 @@
 grammar Mocha;
 
-program : 'begin' body 'end';
-body : statement*;
+program : 'begin' body 'end' ;
+body : statement* ;
 statement
-        : variable_declaration
-        | assignment_statement
-        | if_else_statement
-        | for_statement
-        | while_statement
-        | for_in_range_statement
-        | print_statement
-        ;
+    : variable_declaration
+    | assignment_statement
+    | if_else_statement
+    | for_statement
+    | while_statement
+    | for_in_range_statement
+    | print_statement ;
 
-variable_declaration : data_type identifier_list;
-data_type : 'int' | 'float' | 'boolean' | 'string';
-identifier_list
-                : IDENTIFIER
-                | IDENTIFIER '=' literal
-                | IDENTIFIER ',' identifier_list
-                | IDENTIFIER '=' literal ',' identifier_list
-                ;
+/* VARIABLE DECLARATION DEFINITION */
+variable_declaration : DATA_TYPE identifier_list ;
+identifier_list : IDENTIFIER (OP_ASSIGN LITERAL)? (',' identifier_list)? ;
 
-literal : integral_literal | floating_point_literal | boolean_literal /*| string_literal*/;
-integral_literal : SIGN? DIGIT | SIGN? NON_ZERO_DIGIT DIGITS;
-floating_point_literal : SIGN? integral_literal '.' DIGITS;
-/*string_literal : ''; */
-boolean_literal : 'true' | 'false';
+/* ASSIGNMENT STATEMENT DEFINITION */
+assignment_statement : IDENTIFIER OP_ASSIGN expression ;
 
+/* EXPRESSION DEFINITION */
+expression
+    : arithmetic_expression
+    | relational_expression
+    | logical_expression
+    | ternary_expression
+    | expression_term ;
+
+/* ARITHMETIC EXPRESSION DEFINITION */
+arithmetic_expression : arithmetic_expression_term arithmetic_expression_1;
+arithmetic_expression_1
+                    : (OP_ADD arithmetic_expression_term arithmetic_expression_1
+                    | OP_SUB arithmetic_expression_term arithmetic_expression_1)? ;
+arithmetic_expression_term : expression_term arithmetic_expression_term_1 ;
+arithmetic_expression_term_1
+                    : (OP_MUL expression_term arithmetic_expression_term_1
+                    | OP_DIV expression_term arithmetic_expression_term_1 )? ;
+
+/* RELATIONAL EXPRESSION DEFINITION */
+relational_expression : expression_term OP_SET_RELATIONAL expression_term ;
+
+/* LOGICAL EXPRESSION DEFINITION */
+logical_expression
+    : expression_term OP_SET_LOGICAL_BIN expression_term
+    | OP_SET_LOGICAL_uni expression_term ;
+
+/* TERNARY EXPRESSION DEFINITION */
+ternary_expression : relational_expression OP_TERNARY_TRUE expression OP_TERNARY_FALSE expression ;
+
+expression_term : IDENTIFIER | LITERAL ;
+
+if_else_statement : 'if' if_condition '{' statement '}' ('else' '{' statement '}')? ;
+if_condition: relational_expression | logical_expression ;
+
+for_statement : 'for' for_expression '{' statement '}' ;
+for_expression : IDENTIFIER OP_ASSIGN INTEGER_LITERAL 'to' INTEGER_LITERAL ;
+
+while_statement: 'while' while_condition '{' statement '}' ;
+while_condition: relational_expression | logical_expression ;
+
+for_in_range_statement: 'for' IDENTIFIER 'in' range '{' statement '}' ;
+range : INTEGER_LITERAL ',' INTEGER_LITERAL ;
+
+print_statement: 'print' print_argument_list ;
+print_argument_list
+    : LITERAL (',' print_argument_list)?
+    | IDENTIFIER (',' print_argument_list)? ;
+
+/* DATA TYPE DEFINITIONS */
+DATA_TYPE : DATA_TYPE_INT | DATA_TYPE_FLOAT | DATA_TYPE_BOOLEAN | DATA_TYPE_STRING;
+DATA_TYPE_INT       : 'int';
+DATA_TYPE_FLOAT     : 'float';
+DATA_TYPE_BOOLEAN   : 'boolean';
+DATA_TYPE_STRING    : 'string';
+
+/* IDENTIFIER DEFINITION */
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
-SIGN : [+-];
-DIGIT : [0-9];
-DIGITS : DIGIT+;
-NON_ZERO_DIGIT : [1-9];
-WS : [ \t\r\n]+ -> skip ;
 
-assignment_statement : IDENTIFIER '=' literal
-                | IDENTIFIER '=' arithmetic_expression;
+/* LITERAL DEFINITION */
+LITERAL : INTEGER_LITERAL | FLOATING_POINT_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL ;
+INTEGER_LITERAL : [+-]? [0-9] | [+-]? [1-9][0-9]+ ;
+FLOATING_POINT_LITERAL : INTEGER_LITERAL '.' [0-9]+ ;
+BOOLEAN_LITERAL : BOOLEAN_TRUE | BOOLEAN_FALSE ;
+STRING_LITERAL : '"' .*? '"' ;
 
-/*# Grammar rules for assignment statement and expressions
-<assignment_statement> → <identifier> = <expression>
+BOOLEAN_TRUE : 'true' ;
+BOOLEAN_FALSE : 'false' ;
 
-<expression> → <arithmetic_expression> |
-<relational_expression> |
-<logical_expression> |
-<ternary_expression> |
-<expression_term>
+WHITESPACE : [ \t\r\n]+ -> skip ;
 
-<arithmetic_expression> → <arithmetic_expression_term> <arithmetic_expression_1>
-<arithmetic_expression_1> → + <arithmetic_expression_term> <arithmetic_expression_1> |
-- <arithmetic_expression_term> <arithmetic_expression_1> |
- ε
+/* ASSIGNMENT OPERATOR DEFINITION */
+OP_ASSIGN : '=';
 
-<arithmetic_expression_term> → <expression_term> <arithmetic_expression_term_1>
-<arithmetic_expression_term_1> → * <expression_term> <arithmetic_expression_term_1> |
-/ <expression_term> <arithmetic_expression_term_1> |
-ε
+/* ARITHMETIC OPERATOR DEFINTIONS */
+OP_SET_ARITHMETIC : OP_ADD | OP_SUB | OP_MUL | OP_DIV;
+OP_ADD : '+';
+OP_SUB : '-';
+OP_MUL : '*';
+OP_DIV : '/';
 
-<relational_expression> → <expression_term> <relational_operator> <expression_term>
-<relational_operator> → c
+/* RELATIONAL OPERATOR DEFINITIONS */
+OP_SET_RELATIONAL : OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS;
+OP_EQUALS : '==';
+OP_SMALLER : '<';
+OP_GREATER : '>';
+OP_SMALLER_EQUALS : '<=';
+OP_GREATER_EQUALS : '>=';
 
-<logical_expression> → <expression_term> <logical_operator_binary> <expression_term> |
-<logical_operator_unary> <expression_term>
-<logical_operator_binary> → and | or
-<logical_operator_unary> → not
+/* LOGICAL OPERATOR DEFINITIONS */
+OP_SET_LOGICAL : OP_SET_LOGICAL_UNI | OP_SET_LOGICAL_BIN;
+OP_SET_LOGICAL_UNI : OP_LOGICAL_NOT;
+OP_SET_LOGICAL_BIN : OP_LOGICAL_AND | OP_LOGICAL_OR;
+OP_LOGICAL_AND : 'and';
+OP_LOGICAL_OR  : 'or';
+OP_LOGICAL_NOT : 'not';
 
-<ternary_expression> → <relational_expression> ? <ternary_result> : <ternary_result>
-<ternary_result> → <arithmetic_expression> | <expression_term>
-
-<expression_term> → <identifier> | <literal>*/
-
-
-
-/*# Grammar rules for the if-else construct
-<if_else_statement> → if <if_condition> \n { \n <statement> \n }
-<if_else_statement> → if <if_condition> \n { \n <statement> \n } \n else \n { \n <statement> \n }
-<if_condition> → <relational_expression> | <logical_expression>*/
-
-// expression
-// left recursion not handled yet
-expression : 
-        arithmetic_expression
-        | relational_expression
-        // | logical_expression
-        // | ternary_expression
-        | expression_term
-        ;
-
-arithmetic_expression : 
-        arithmetic_expression '+' arithmetic_term
-        | arithmetic_expression '-' arithmetic_term
-        | arithmetic_term
-        ;
-arithmetic_term :
-        arithmetic_term '*' expression_term
-        | arithmetic_term '/' expression_term
-        | expression_term
-        ;
-
-if_else_statement
-                :   'if' '(' if_condition ')' statement ('else' statement)?
-                ;
-
-if_condition: relational_expression;
-
-relational_expression: expression_term (('=='|'!='|'<'|'>'|'<='|'>=')) expression_term;
-
-Less : '<';
-LessEqual : '<=';
-Greater : '>';
-GreaterEqual : '>=';
-Equal : '==';
-NotEqual : '!=';
-
-expression_term: IDENTIFIER
-               | literal
-               | '(' arithmetic_expression ')'
-               ;
-
-
-/*# Grammar rules for the for construct
-<for_statement> → for <for_expression> \n { \n <statement> \n }
-<for_expression> → <identifier> = <digits> to <digits>*/
-
-for_statement
-             : 'for' for_expression '{' statement '}'
-             ;
-
-for_expression: IDENTIFIER '=' DIGIT 'to' DIGITS;
-
-
-/*# Grammar rules for the while construct
-<while_statement> → while 	<while_condition> \n { \n <statement> \n }
-<while_condition> → <logical_expression> | <relational_expression>*/
-
-while_statement: 'while' while_condition '{' statement '}';
-while_condition: relational_expression;
-
-/*# Grammar rules for the for in range construct
-<for_in_range_statement> → for <identifier> in <range> \n { \n <statement> \n }
-<range> → <digits> , <digits>*/
-
-for_in_range_statement: 'for' IDENTIFIER 'In' range '{' statement '}';
-
-range: DIGITS;
-
-/*# Grammar rules for the print construct
-<print_statement> → print <print_argument_list>
-<print_argument_list> → <literal> |
-<identifier> |
-<literal> , <print_argument_list> |
-<identifier>, <print_argument_list>*/
-
-print_statement: 'print';
-
-
-
+/* TERNARY OPERATOR DEFINITIONS */
+OP_TERNARY_TRUE  : '?' ;
+OP_TERNARY_FALSE : ':' ;
