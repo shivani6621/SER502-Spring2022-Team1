@@ -1,4 +1,4 @@
-// Generated from C:/Users/risha/Documents/GitHub/ser502-project/src/main/antlr4\Mocha.g4 by ANTLR 4.10.1
+// Generated from C:/Users/risha/Documents/GitHub/mocha/src\Mocha.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -86,36 +86,6 @@ public interface MochaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MochaParser#arithmetic_expression_1}.
-	 * @param ctx the parse tree
-	 */
-	void enterArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link MochaParser#arithmetic_expression_1}.
-	 * @param ctx the parse tree
-	 */
-	void exitArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx);
-	/**
-	 * Enter a parse tree produced by {@link MochaParser#arithmetic_expression_term}.
-	 * @param ctx the parse tree
-	 */
-	void enterArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MochaParser#arithmetic_expression_term}.
-	 * @param ctx the parse tree
-	 */
-	void exitArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MochaParser#arithmetic_expression_term_1}.
-	 * @param ctx the parse tree
-	 */
-	void enterArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link MochaParser#arithmetic_expression_term_1}.
-	 * @param ctx the parse tree
-	 */
-	void exitArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link MochaParser#relational_expression}.
 	 * @param ctx the parse tree

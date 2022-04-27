@@ -1,4 +1,4 @@
-// Generated from C:/Users/risha/Documents/GitHub/ser502-project/src/main/antlr4\Mocha.g4 by ANTLR 4.10.1
+// Generated from C:/Users/risha/Documents/GitHub/mocha/src\Mocha.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -57,24 +57,6 @@ public interface MochaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MochaParser#arithmetic_expression_1}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx);
-	/**
-	 * Visit a parse tree produced by {@link MochaParser#arithmetic_expression_term}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MochaParser#arithmetic_expression_term_1}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link MochaParser#relational_expression}.
 	 * @param ctx the parse tree

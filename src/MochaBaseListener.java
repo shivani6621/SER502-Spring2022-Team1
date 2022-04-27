@@ -1,4 +1,4 @@
-// Generated from C:/Users/risha/Documents/GitHub/ser502-project/src/main/antlr4\Mocha.g4 by ANTLR 4.10.1
+// Generated from C:/Users/risha/Documents/GitHub/mocha/src\Mocha.g4 by ANTLR 4.10.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -106,42 +106,6 @@ public class MochaBaseListener implements MochaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,4 +1,4 @@
-// Generated from C:/Users/risha/Documents/GitHub/ser502-project/src/main/antlr4\Mocha.g4 by ANTLR 4.10.1
+// Generated from C:/Users/risha/Documents/GitHub/mocha/src\Mocha.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -66,27 +66,6 @@ public class MochaBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitArithmetic_expression_1(MochaParser.Arithmetic_expression_1Context ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitArithmetic_expression_term(MochaParser.Arithmetic_expression_termContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitArithmetic_expression_term_1(MochaParser.Arithmetic_expression_term_1Context ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
