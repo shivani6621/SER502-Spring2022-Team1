@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.PrintStream;
 
 public class MainFrame extends JFrame {
     private static final int DEFAULT_WINDOW_HEIGHT = 500;
@@ -59,9 +60,10 @@ public class MainFrame extends JFrame {
         CommonTokenStream commonTokenStream = new CommonTokenStream(mochaLexer);
         MochaParser mochaParser = new MochaParser(commonTokenStream);
         ParseTree parseTree = mochaParser.program();
-        jTextAreaProgramOutput.setText(parseTree.toStringTree(mochaParser));
+        jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\nProgram Output:\n");
 
-        MyMochaVisitor myMochaVisitor = new MyMochaVisitor();
+        PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
+        MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
         myMochaVisitor.visit(parseTree);
 
         // ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
