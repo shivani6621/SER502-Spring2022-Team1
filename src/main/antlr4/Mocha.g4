@@ -16,25 +16,21 @@ variable_declaration : DATA_TYPE identifier_list ;
 identifier_list : IDENTIFIER (OP_ASSIGN LITERAL)? (',' identifier_list)? ;
 
 /* ASSIGNMENT STATEMENT DEFINITION */
-assignment_statement : IDENTIFIER OP_ASSIGN expression ;
+assignment_statement : IDENTIFIER OP_ASSIGN expression;
 
 /* EXPRESSION DEFINITION */
 expression
     : arithmetic_expression
     | relational_expression
     | logical_expression
-    | ternary_expression
-    | expression_term ;
+    | ternary_expression ;
 
-/* ARITHMETIC EXPRESSION DEFINITION */
-arithmetic_expression : arithmetic_expression_term arithmetic_expression_1;
-arithmetic_expression_1
-                    : (OP_ADD arithmetic_expression_term arithmetic_expression_1
-                    | OP_SUB arithmetic_expression_term arithmetic_expression_1)? ;
-arithmetic_expression_term : expression_term arithmetic_expression_term_1 ;
-arithmetic_expression_term_1
-                    : (OP_MUL expression_term arithmetic_expression_term_1
-                    | OP_DIV expression_term arithmetic_expression_term_1 )? ;
+arithmetic_expression :
+        expression_term
+        | '(' arithmetic_expression ')'
+        | arithmetic_expression(OP_MUL | OP_DIV) arithmetic_expression
+        | arithmetic_expression(OP_ADD | OP_SUB) arithmetic_expression
+        ;
 
 /* RELATIONAL EXPRESSION DEFINITION */
 relational_expression : expression_term OP_SET_RELATIONAL expression_term ;
@@ -92,7 +88,7 @@ WHITESPACE : [ \t\r\n]+ -> skip ;
 OP_ASSIGN : '=';
 
 /* ARITHMETIC OPERATOR DEFINTIONS */
-OP_SET_ARITHMETIC : OP_ADD | OP_SUB | OP_MUL | OP_DIV;
+//OP_SET_ARITHMETIC : OP_ADD | OP_SUB | OP_MUL | OP_DIV;
 OP_ADD : '+';
 OP_SUB : '-';
 OP_MUL : '*';
