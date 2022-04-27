@@ -35,6 +35,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return super.visitStatement(ctx);
     }
 
+    @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
         return super.visitVariable_declaration(ctx);
     }
