@@ -1,4 +1,4 @@
-// Generated from C:/Users/risha/Documents/GitHub/mocha/src\Mocha.g4 by ANTLR 4.10.1
+// Generated from C:/Users/risha/Documents/GitHub/ser502-project/src\Mocha.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**

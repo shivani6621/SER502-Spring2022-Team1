@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/mocha.iml" filepath="$PROJECT_DIR$/mocha.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ser502-project.iml" filepath="$PROJECT_DIR$/ser502-project.iml" />
     </modules>
   </component>
 </project>
