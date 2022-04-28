@@ -1,5 +1,8 @@
+import com.sun.jdi.Value;
+
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MyMochaVisitor extends MochaBaseVisitor<Object> {
@@ -16,6 +19,9 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     */
 
     private final PrintStream outputStream;
+    private List<String> vars;
+    private List<String> semanticsErrors;
+    private Map<String, Value> variable = new HashMap<String, Value>();
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
@@ -36,17 +42,23 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+        String idToken = ctx.identifier_list().getText();
         return super.visitVariable_declaration(ctx);
     }
 
     @Override
     public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
+        String identifierText = ctx.identifier_list().getText();
         return super.visitIdentifier_list(ctx);
     }
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
-        return super.visitAssignment_statement(ctx);
+
+        String id = ctx.IDENTIFIER().getText();
+        Object value = (double) visit(ctx.expression());
+        return variable.put(id, (Value) value);
+
     }
 
     @Override
@@ -61,6 +73,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
+        //Value left = this.visit
         return super.visitRelational_expression(ctx);
     }
 
@@ -101,6 +114,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
+        /*Object value =  this.visit(ctx.while_condition());
+        while(value.equals(Object)){
+            this.visit(ctx.statement());
+            value= (Value) this.visit(ctx.while_condition());
+        }
+        return Value;*/
         return super.visitWhile_statement(ctx);
     }
 
