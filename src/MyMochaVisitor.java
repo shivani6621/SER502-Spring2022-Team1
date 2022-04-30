@@ -119,11 +119,21 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        System.out.println("expression_term: " + ctx.getText());
-        Var value = new Var();
-        value.setValue("1");
-        value.setDataType("int");
-        return value;
+        String rtn;
+        if (ctx.IDENTIFIER() != null) {
+            if (!variable.containsKey(ctx.IDENTIFIER().getText())) {
+                Token idToken = ctx.IDENTIFIER().getSymbol();
+                int line = idToken.getLine();
+                int column = idToken.getCharPositionInLine() + 1;
+                String id = ctx.IDENTIFIER().getText();
+                outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+                semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+            }
+            rtn = ctx.IDENTIFIER().getText();
+        } else {
+            rtn = ctx.LITERAL().getText();
+        }
+        return rtn;
     }
 
     @Override
