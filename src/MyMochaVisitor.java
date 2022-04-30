@@ -25,6 +25,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         outputStream.println("Visiting Program ...");
         return visitChildren(ctx);
     }
+
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
         outputStream.println("Visiting Body ...");
         return visitChildren(ctx);
@@ -32,101 +33,101 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitStatement(MochaParser.StatementContext ctx) {
-        return super.visitStatement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
-        return super.visitVariable_declaration(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
-        return super.visitIdentifier_list(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
-        return super.visitAssignment_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitExpression(MochaParser.ExpressionContext ctx) {
-        return super.visitExpression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-        return super.visitArithmetic_expression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
-        return super.visitRelational_expression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
-        return super.visitLogical_expression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
-        return super.visitTernary_expression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        return super.visitExpression_term(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
-        return super.visitIf_else_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitIf_condition(MochaParser.If_conditionContext ctx) {
-        return super.visitIf_condition(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitFor_statement(MochaParser.For_statementContext ctx) {
-        return super.visitFor_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitFor_expression(MochaParser.For_expressionContext ctx) {
-        return super.visitFor_expression(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
-        return super.visitWhile_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitWhile_condition(MochaParser.While_conditionContext ctx) {
-        return super.visitWhile_condition(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitFor_in_range_statement(MochaParser.For_in_range_statementContext ctx) {
-        return super.visitFor_in_range_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitRange(MochaParser.RangeContext ctx) {
-        return super.visitRange(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
-        return super.visitPrint_statement(ctx);
+        return visitChildren(ctx);
     }
 
     @Override
     public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
-        return super.visitPrint_argument_list(ctx);
+        return visitChildren(ctx);
     }
 }
