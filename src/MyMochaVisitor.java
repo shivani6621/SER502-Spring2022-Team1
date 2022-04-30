@@ -75,7 +75,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
-
         Token idToken = ctx.IDENTIFIER().getSymbol();
         int line = idToken.getLine();
         int column = idToken.getCharPositionInLine() + 1;
@@ -86,7 +85,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
         } else {
             // TYPE CHECKING HERE
-            Value value = (Value) visit(ctx.expression());
+            Var value = (Var) visit(ctx.expression());
+            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
             variable.put(id, value);
         }
         return null;
