@@ -1,5 +1,8 @@
+import com.sun.jdi.Value;
+
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MyMochaVisitor extends MochaBaseVisitor<Object> {
@@ -15,7 +18,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             private Map<String, String> stringVariableMap = new HashMap<>();
     */
 
-    private final PrintStream outputStream;
+    private PrintStream outputStream;
+    private List<String> vars;
+    private List<String> semanticsErrors;
+    private Map<String, Var> variable = new HashMap<String, Var>();
+    //private Map<String, Value> variable = new HashMap<String, Value>();
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
@@ -38,6 +45,13 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+        String data_type = ctx.DATA_TYPE().getText();
+        String idToken = ctx.identifier_list().getText();
+        Var var = new Var();
+        var.setDataType(data_type);
+        var.setValue("");
+        variable.put(idToken,var);
+        outputStream.println(variable.get("i").toString());
         return visitChildren(ctx);
     }
 
