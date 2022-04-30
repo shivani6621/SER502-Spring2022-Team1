@@ -29,12 +29,10 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {
-        outputStream.println("Visiting Program ...");
         return visitChildren(ctx);
     }
 
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
-        outputStream.println("Visiting Body ...");
         return visitChildren(ctx);
     }
 
@@ -47,11 +45,15 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
         String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
-        Var var = new Var();
-        var.setDataType(data_type);
-        var.setValue("");
-        variable.put(idToken,var);
-        outputStream.println(variable.get("i").toString());
+        if (!variable.containsKey(idToken)){
+            Var var = new Var();
+            var.setDataType(data_type);
+            var.setValue("");
+            variable.put(idToken,var);
+        }else {
+            outputStream.println("Semantic error : duplicate declaration !");
+            return null;
+        }
         return visitChildren(ctx);
     }
 
