@@ -1,6 +1,9 @@
 import com.sun.jdi.Value;
 import org.antlr.v4.runtime.Token;
+
+import javax.sound.midi.Soundbank;
 import java.io.PrintStream;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,12 +25,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     private final PrintStream outputStream;
     private List<String> semanticsErrors;
-    private Map<String, Value> variable;
+    private Map<String, Var> variable;
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.semanticsErrors = new ArrayList<>();
-        this.variable = new HashMap<String, Value>();
+        this.variable = new HashMap<String, Var>();
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {
@@ -60,19 +63,16 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         var.setDataType(data_type);
         var.setValue("");
         variable.put(idToken,var);
-        outputStream.println(variable.get("i").toString());
         return visitChildren(ctx);
     }
 
     @Override
     public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
-        String identifierText = ctx.identifier_list().getText();
         return visitChildren(ctx);
     }
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
-
         Token idToken = ctx.IDENTIFIER().getSymbol();
         int line = idToken.getLine();
         int column = idToken.getCharPositionInLine() + 1;
@@ -83,7 +83,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
         } else {
             // TYPE CHECKING HERE
-            Value value = (Value) visit(ctx.expression());
+            Var value = (Var) visit(ctx.expression());
+            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
             variable.put(id, value);
         }
         return null;
@@ -118,7 +119,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        return visitChildren(ctx);
+        System.out.println("expression_term: " + ctx.getText());
+        Var value = new Var();
+        value.setValue("1");
+        value.setDataType("int");
+        return value;
     }
 
     @Override
