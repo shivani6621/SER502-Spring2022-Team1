@@ -1,6 +1,7 @@
 import com.sun.jdi.Value;
-
+import org.antlr.v4.runtime.Token;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,15 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             private Map<String, String> stringVariableMap = new HashMap<>();
     */
 
-    private PrintStream outputStream;
-    private List<String> vars;
+
+    private final PrintStream outputStream;
     private List<String> semanticsErrors;
-    private Map<String, Var> variable = new HashMap<String, Var>();
-    //private Map<String, Value> variable = new HashMap<String, Value>();
+    private Map<String, Value> variable;
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
+        this.semanticsErrors = new ArrayList<>();
+        this.variable = new HashMap<String, Value>();
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {
@@ -35,8 +37,15 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
         outputStream.println("Visiting Body ...");
+        System.out.println(ctx.getText());
+        System.out.println("there are " + ctx.statement().size() + " statements");
+//        for (MochaParser.StatementContext statementContext : ctx.statement()) {
+//            System.out.println("statementContext: " + statementContext.getText());
+//            visitChildren(statementContext);
+//        }
         return visitChildren(ctx);
     }
+
 
     @Override
     public Object visitStatement(MochaParser.StatementContext ctx) {
@@ -57,12 +66,27 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
+        String identifierText = ctx.identifier_list().getText();
         return visitChildren(ctx);
     }
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
-        return visitChildren(ctx);
+
+        Token idToken = ctx.IDENTIFIER().getSymbol();
+        int line = idToken.getLine();
+        int column = idToken.getCharPositionInLine() + 1;
+
+        String id = ctx.IDENTIFIER().getText();
+        if (!variable.containsKey(id)) {
+            outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+        } else {
+            // TYPE CHECKING HERE
+            Value value = (Value) visit(ctx.expression());
+            variable.put(id, value);
+        }
+        return null;
     }
 
     @Override
@@ -77,6 +101,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
+
+        //Value left = this.visit
         return visitChildren(ctx);
     }
 
