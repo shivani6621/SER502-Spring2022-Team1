@@ -22,12 +22,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     private final PrintStream outputStream;
     private List<String> semanticsErrors;
-    private Map<String, Value> variable;
+    private Map<String, Var> variable;
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.semanticsErrors = new ArrayList<>();
-        this.variable = new HashMap<String, Value>();
+        this.variable = new HashMap<String, Var>();
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {

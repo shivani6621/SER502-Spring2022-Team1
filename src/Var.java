@@ -1,5 +1,6 @@
 public class Var {
     private String dataType;
+    private String value;
 
     public String getDataType() {
         return dataType;
@@ -17,5 +18,4 @@ public class Var {
         this.value = value;
     }
 
-    private String value;
 }
