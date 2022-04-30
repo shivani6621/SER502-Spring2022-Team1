@@ -1,6 +1,5 @@
 import com.sun.jdi.Value;
 import org.antlr.v4.runtime.Token;
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +19,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             private Map<String, String> stringVariableMap = new HashMap<>();
     */
 
+
     private final PrintStream outputStream;
     private List<String> semanticsErrors;
     private Map<String, Value> variable;
@@ -34,6 +34,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         outputStream.println("Visiting Program ...");
         return visitChildren(ctx);
     }
+
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
         outputStream.println("Visiting Body ...");
         System.out.println(ctx.getText());
@@ -53,9 +54,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+        String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
-        outputStream.println("Declaring variable " + idToken + " of type " + ctx.DATA_TYPE().getText());
-        return null;
+        Var var = new Var();
+        var.setDataType(data_type);
+        var.setValue("");
+        variable.put(idToken,var);
+        outputStream.println(variable.get("i").toString());
+        return visitChildren(ctx);
     }
 
     @Override
@@ -66,6 +72,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
+
         Token idToken = ctx.IDENTIFIER().getSymbol();
         int line = idToken.getLine();
         int column = idToken.getCharPositionInLine() + 1;
@@ -80,7 +87,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             variable.put(id, value);
         }
         return null;
-
     }
 
     @Override
@@ -95,6 +101,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
+
         //Value left = this.visit
         return visitChildren(ctx);
     }
@@ -136,12 +143,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
-        /*Object value =  this.visit(ctx.while_condition());
-        while(value.equals(Object)){
-            this.visit(ctx.statement());
-            value= (Value) this.visit(ctx.while_condition());
-        }
-        return Value;*/
         return visitChildren(ctx);
     }
 
