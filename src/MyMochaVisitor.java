@@ -58,18 +58,16 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         if (!variable.containsKey(idToken)){
             Var var = new Var();
             var.setDataType(data_type);
-            var.setValue("");
             variable.put(idToken,var);
         }else {
-            outputStream.println("Semantic error : duplicate declaration !");
-            return null;
+            outputStream.println("Err: duplicate declare " + idToken);
+            semanticsErrors.add("Err: duplicate declare " + idToken);
         }
         return visitChildren(ctx);
     }
 
     @Override
     public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
-        String identifierText = ctx.identifier_list().getText();
         return visitChildren(ctx);
     }
 
