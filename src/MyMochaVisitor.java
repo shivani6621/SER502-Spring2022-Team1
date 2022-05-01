@@ -148,13 +148,27 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
-        return visitChildren(ctx);
+        Boolean left = Boolean.valueOf(visit(ctx.expression_term(0)).toString()) ;
+        Boolean right = Boolean.valueOf(visit(ctx.expression_term(1)).toString());
+        String op = ctx.children.get(1).getText();
+        if (op.equals("and")) {
+            return left && right;
+        } else if (op.equals("or")) {
+            return left || right;
+        }else if (op.equals("not")){
+            return left != right;
+        }else{
+            return null;
+        }
+
     }
 
     @Override
     public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
+
         return visitChildren(ctx);
     }
+
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
