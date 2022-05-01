@@ -33,17 +33,19 @@ arithmetic_expression :
         ;
 
 /* RELATIONAL EXPRESSION DEFINITION */
-relational_expression : expression_term (OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS) expression_term ;
+relational_expression : expression_term (OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS) expression_term
+    | expression_term;
 
 /* LOGICAL EXPRESSION DEFINITION */
 logical_expression
     : expression_term (OP_LOGICAL_AND | OP_LOGICAL_OR) expression_term
-    | OP_LOGICAL_NOT expression_term ;
+    | OP_LOGICAL_NOT expression_term
+    | expression_term;
 
 /* TERNARY EXPRESSION DEFINITION */
 ternary_expression : relational_expression OP_TERNARY_TRUE expression OP_TERNARY_FALSE expression ;
 
-expression_term : IDENTIFIER | literal ;
+expression_term : IDENTIFIER | literal | BOOLEAN_FALSE | BOOLEAN_TRUE;
 
 if_else_statement : 'if' if_condition '{' body '}' ('else' '{' body '}')? ;
 if_condition: relational_expression | logical_expression ;

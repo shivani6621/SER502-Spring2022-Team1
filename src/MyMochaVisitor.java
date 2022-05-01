@@ -102,6 +102,9 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
+        if (ctx.expression_term().size() < 2) {
+            return visitChildren(ctx);
+        }
         Double left = Double.valueOf(visit(ctx.expression_term(0)).toString()) ;
         Double right = Double.valueOf(visit(ctx.expression_term(1)).toString());
         String op = ctx.children.get(1).getText();
@@ -122,9 +125,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
-        if (ctx.expression_term().size() < 2 && ctx.OP_LOGICAL_NOT() != null) {
+        if (ctx.OP_LOGICAL_NOT() != null) {
             return ! Boolean.valueOf(visit(ctx.expression_term(0)).toString());
+        } else if (ctx.expression_term().size() == 1) {
+            return visit(ctx.expression_term(0));
         }
+
         Boolean left = Boolean.valueOf(visit(ctx.expression_term(0)).toString()) ;
         Boolean right = Boolean.valueOf(visit(ctx.expression_term(1)).toString());
         String op = ctx.children.get(1).getText();
@@ -157,6 +163,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
+        if (ctx.BOOLEAN_FALSE() != null) {
+            return false;
+        }
+        if (ctx.BOOLEAN_TRUE() != null) {
+            return true;
+        }
         Object rtn;
         if (ctx.IDENTIFIER() != null) {
             Token idToken = ctx.IDENTIFIER().getSymbol();
