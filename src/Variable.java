@@ -28,6 +28,10 @@ public class Variable {
     public void setValue(Object newValue) throws Exception {
         if (newValue.getClass().equals(value.getClass()))
             this.value = newValue;
+        else if (newValue.getClass().equals(Integer.class) && value.getClass().equals(Double.class))
+            this.value = ((Integer) newValue).doubleValue();
+        else if (newValue.getClass().equals(Double.class) && value.getClass().equals(Integer.class))
+            this.value = ((Double) newValue).intValue();
         else throw new Exception("incompatible type");
     }
 
