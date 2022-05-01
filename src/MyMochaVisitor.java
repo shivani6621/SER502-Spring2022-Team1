@@ -342,7 +342,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public void printResults() {
         if (semanticsErrors.size() == 0) {
             outputStream.println("Compiled successfully");
-            printEnvironment();
+//            printEnvironment();
         } else {
             for (String semanticsError : semanticsErrors) {
                 outputStream.println(semanticsError);
@@ -350,10 +350,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         }
     }
 
-    public void printEnvironment() {
-        for (Map.Entry<String, Variable> variableEntry : variableMap.entrySet()) {
-            Variable variable = variableEntry.getValue();
-            outputStream.println(variableEntry.getKey() + "(" + variable.getType() + ") = "  + variable.getValue());
-        }
-    }
+    public Map<String, Variable> getVariableMap() {
+        return variableMap;
+    };
 }

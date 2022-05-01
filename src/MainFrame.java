@@ -5,15 +5,21 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.PrintStream;
+import java.util.Map;
 
 public class MainFrame extends JFrame {
     private static final int DEFAULT_WINDOW_HEIGHT = 500;
     private static final int DEFAULT_WINDOW_WIDTH = 800;
 
     private final JTextArea jTextAreaCodeEditor;
+
     private final JTextArea jTextAreaProgramOutput;
+
+    private final DefaultTableModel modelEnvironment;
+    private final JTable jTableEnvironment;
 
     public MainFrame(){
         super("Mocha");
@@ -22,7 +28,8 @@ public class MainFrame extends JFrame {
         jPanelMainPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0; c.gridy = 0; c.fill = GridBagConstraints.BOTH; c.weightx = 1; c.weighty = 5;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0; c.gridy = 0; c.gridwidth = 2; c.weightx = 1; c.weighty = 5;
         c.insets = new Insets(2,5,2,5);
 
         jTextAreaCodeEditor = new JTextArea();
@@ -33,14 +40,21 @@ public class MainFrame extends JFrame {
         jTextAreaProgramOutput = new JTextArea();
         jTextAreaProgramOutput.setLineWrap(true);
 
-        c.gridx = 0; c.gridy = 2; c.weighty = 2;
+        c.gridx = 0; c.gridy = 2; c.gridwidth = 1; c.weightx = 5; c.weighty = 4;
         jPanelMainPanel.add(new JScrollPane(jTextAreaProgramOutput), c);
+
+        modelEnvironment = new DefaultTableModel(new String[] { "Variable", "Type", "Value" }, 0);
+        jTableEnvironment = new JTable(modelEnvironment);
+
+        c.gridx = 1; c.gridy = 2; c.gridwidth = 1; c.weightx = 3; c.weighty = 4;
+        jPanelMainPanel.add(new JScrollPane(jTableEnvironment), c);
 
         JButton jButtonRun = new JButton("Run");
         jButtonRun.setHorizontalAlignment(JButton.CENTER);
         jButtonRun.addActionListener(e -> run());
 
-        c.gridx = 0; c.gridy = 1; c.fill = GridBagConstraints.HORIZONTAL; c.weighty = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0; c.gridy = 1; c.gridwidth = 2; c.weighty = 0;
         jPanelMainPanel.add(jButtonRun, c);
 
         add(jPanelMainPanel);
@@ -65,7 +79,12 @@ public class MainFrame extends JFrame {
         PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
         MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
         myMochaVisitor.visit(parseTree);
+
         myMochaVisitor.printResults();
+        for (Map.Entry<String, Variable> variableEntry : myMochaVisitor.getVariableMap().entrySet()) {
+            Variable variable = variableEntry.getValue();
+            modelEnvironment.addRow(new Object[] { variableEntry.getKey(), variable.getType(), variable.getValue() });
+        }
 
         // ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
     }
