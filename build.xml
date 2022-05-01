@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project name="SER502-Spring2022-Team1" default="run" basedir=".">
+   <property name="lib" value="lib" />
+   <property name="src" value="src"/>
+   <property name="dest" value="classes"/>
+   <property name="SER502-Spring2022-Team1" value="SER502-Spring2022-Team1.jar"/>
+   <path id="lib_classpath">
+      <fileset dir="${lib}" includes="*.jar" />
+   </path>
+   <target name="init">
+      <mkdir dir="${dest}"/>
+   </target>
+   <target name="compile" depends="init">
+      <javac srcdir="${src}" destdir="${dest}" classpathref="lib_classpath"/>
+   </target>
+   <target name="build" depends="compile">
+      <jar jarfile="${SER502-Spring2022-Team1}" basedir="${dest}">
+         <manifest>
+            <attribute name="Main-Class" value="MainFrame"/>
+         </manifest>
+      </jar>
+   </target>
+   <target name="compile/build" depends="init">
+      <javac srcdir="${src}" destdir="${dest}"/>
+      <jar jarfile="${SER502-Spring2022-Team1}" basedir="${dest}">
+         <manifest>
+            <attribute name="Main-Class" value="MainFrame"/>
+         </manifest>
+      </jar>
+   </target>
+   <target name="run" depends="build">
+      <java classname="test.ant.HelloWorld" classpath="${SER502-Spring2022-Team1}"/>
+   </target>
+   <target name="clean">
+      <delete dir="${dest}" />
+      <delete file="${SER502-Spring2022-Team1}" />
+   </target>
+   <target name="rerun" depends="clean,run">
+      <ant target="clean" />
+      <ant target="run" />
+   </target>
+</project>
