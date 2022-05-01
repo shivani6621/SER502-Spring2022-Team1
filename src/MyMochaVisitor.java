@@ -185,74 +185,42 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return null;
     }
 
-    @Override
-    public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
-        Object expr = visit(ctx.relational_expression());
+    @Override public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
+        Object conditionValue = visit(ctx.relational_expression());
         Object value1 = visit(ctx.expression(0));
         Object value2 = visit(ctx.expression(1));
-        if((boolean)expr == true){
-            return value1;
-        }
-        else if((boolean)expr == false){
-            return value2;
-        }
-        else{
-            return null;
-        }
+        return (Boolean) conditionValue ? value1 : value2;
     }
 
-
-    @Override
-    public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        if (ctx.BOOLEAN_FALSE() != null) {
-            return false;
-        }
-        if (ctx.BOOLEAN_TRUE() != null) {
-            return true;
-        }
-        Object rtn;
-        if (ctx.IDENTIFIER() != null) {
+    @Override public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
+        if (ctx.BOOLEAN_FALSE() != null) return false;
+        else if (ctx.BOOLEAN_TRUE() != null) return true;
+        else if (ctx.IDENTIFIER() != null) {
             Token idToken = ctx.IDENTIFIER().getSymbol();
             String identifier = ctx.IDENTIFIER().getText();
             if (!variableMap.containsKey(ctx.IDENTIFIER().getText())) {
                 semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
                         idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
-            rtn = variableMap.get(identifier).getValue();
-        } else {
-            rtn = visit(ctx.literal());
-        }
-        return rtn;
+            return variableMap.get(identifier).getValue();
+        } else return visit(ctx.literal());
     }
 
-    @Override
-    public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
-        if (ctx.if_condition() == null) {
-            return null;
-        }
-        System.out.println("if_else_statement" + ctx.getText());
-        Object cond = visit(ctx.if_condition());
-        if ((boolean)cond) {
-            visit(ctx.body(0));
-        } else {
-            if (ctx.body(1) != null) {
-                visit(ctx.body(1));
-            }
-        }
+    @Override public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
+        Object conditionValue = visit(ctx.if_condition());
+        if ((Boolean) conditionValue) visit(ctx.body(0));
+        else if (ctx.body(1) != null)
+            visit(ctx.body(1));
         return null;
     }
 
-    @Override
-    public Object visitIf_condition(MochaParser.If_conditionContext ctx) {
-        if (ctx.relational_expression() != null) {
+    @Override public Object visitIf_condition(MochaParser.If_conditionContext ctx) {
+        if (ctx.relational_expression() != null)
             return visit(ctx.relational_expression());
-        } else {
-            return visit(ctx.logical_expression());
-        }
+        else return visit(ctx.logical_expression());
     }
 
-    @Override
-    public Object visitFor_statement(MochaParser.For_statementContext ctx) {
+    @Override public Object visitFor_statement(MochaParser.For_statementContext ctx) {
         Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
         String identifier = ctx.for_expression().IDENTIFIER().getText();
         if (variableMap.containsKey(identifier)) {
@@ -261,38 +229,34 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             return null;
         }
 
-        int start = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(0).getText());
-        int end = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(1).getText());
-
         try {
+            int start = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(0).getText());
+            int end = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(1).getText());
+
             Variable variable = new Variable("int");
             variable.setValue(start);
             variableMap.put(identifier, variable);
+
             for (int i = start; i < end; i++) {
                 variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
-        } catch (Exception ex) {
-            // TODO : SEMANTIC ERROR
+        } catch (Exception ignored) {
+        } finally {
+            variableMap.remove(identifier);
         }
-        variableMap.remove(identifier);
         return null;
     }
 
-    @Override
-    public Object visitFor_expression(MochaParser.For_expressionContext ctx) {
+    @Override public Object visitFor_expression(MochaParser.For_expressionContext ctx) {
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
-//        if (ctx.while_condition() == null) {
-//            return null;
-//        }
-        Object cond = visit(ctx.while_condition());
-        while ((boolean) cond) {
+    @Override public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
+        Object conditionValue = visit(ctx.while_condition());
+        while ((Boolean) conditionValue) {
             visit(ctx.body());
-            cond = visit(ctx.while_condition());
+            conditionValue = visit(ctx.while_condition());
         }
         return null;
     }
@@ -311,30 +275,30 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             return null;
         }
 
-        int start = Integer.parseInt(ctx.range().INTEGER_LITERAL(0).getText());
-        int end = Integer.parseInt(ctx.range().INTEGER_LITERAL(1).getText());
-
         try {
+            int start = Integer.parseInt(ctx.range().INTEGER_LITERAL(0).getText());
+            int end = Integer.parseInt(ctx.range().INTEGER_LITERAL(1).getText());
+
             Variable variable = new Variable("int");
             variable.setValue(start);
             variableMap.put(identifier, variable);
+
             for (int i = start; i < end; i++) {
                 variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
-        } catch (Exception ex) {
-            // TODO: SEMANTIC ERROR
+        } catch (Exception ignored) {
+        } finally {
+            variableMap.remove(identifier);
         }
-        variableMap.remove(identifier);
         return null;
     }
 
-    @Override
-    public Object visitRange(MochaParser.RangeContext ctx) {
+    @Override public Object visitRange(MochaParser.RangeContext ctx) {
         return visitChildren(ctx);
     }
 
-    private StringBuilder printBuffer = new StringBuilder();
+    private final StringBuilder printBuffer = new StringBuilder();
     @Override public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
         visit(ctx.print_argument_list());
         return null;
@@ -345,17 +309,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             Token idToken = ctx.IDENTIFIER().getSymbol();
             String identifier = ctx.IDENTIFIER().getText();
             if (variableMap.containsKey(identifier)) {
-                // outputStream.print(variableMap.get(identifier).getValue());
                 printBuffer.append(variableMap.get(identifier).getValue());
             } else {
                 semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
                         idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         } else if (ctx.literal() != null) {
-            // outputStream.print(visit(ctx.literal()));
             printBuffer.append(visit(ctx.literal()));
         }
-        // else semanticsErrors.add("can not print null "); // TODO: DO WE REALLY NEED THIS ? I THINK THIS BRANCH WOULD NEVER BE HIT
         return visitChildren(ctx);
     }
 
@@ -364,7 +325,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         if (ctx.INTEGER_LITERAL() != null) return Integer.parseInt(literal);
         else if (ctx.FLOATING_POINT_LITERAL() != null) return Double.parseDouble(literal);
         else if (ctx.BOOLEAN_LITERAL() != null) return Boolean.parseBoolean(literal);
-        else return literal.substring(1, literal.length() - 1); // TODO: BETTER WAY TO REMOVE THE ENCLOSING QUOTES ?
+        else return literal.substring(1, literal.length() - 1);
     }
 
     @Override public Object visitData_type(MochaParser.Data_typeContext ctx) {
@@ -374,7 +335,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public void printEvaluationResults() {
         if (semanticErrorList.size() == 0) {
             outputStream.println("Program Evaluation Successful.");
-            outputStream.println(printBuffer.toString());
+            outputStream.println(printBuffer);
         } else {
             outputStream.println("Program Evaluation Failed. Please Correct The Following Errors:");
             for (SemanticError semanticsError : semanticErrorList)
