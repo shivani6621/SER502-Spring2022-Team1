@@ -1,10 +1,6 @@
 import org.antlr.v4.runtime.Token;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +23,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
-//        for (MochaParser.StatementContext statementContext : ctx.statement()) {
-//            System.out.println("statementContext: " + statementContext.getText());
-//            visitChildren(statementContext);
-//        }
         return visitChildren(ctx);
     }
 
@@ -72,11 +64,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                     idToken.getLine(), idToken.getCharPositionInLine() + 1));
         } else {
             try {
-                // TODO: TYPE CHECKING
-                Object rtn =  visit(ctx.expression());
-                variableMap.get(identifier).setValue(rtn);
+                Object value = visit(ctx.expression());
+                variableMap.get(identifier).setValue(value);
             } catch (Exception ex) {
-                // TODO: SEMANTIC ERROR
+                semanticErrorList.add(new SemanticError(String.format("variable '%s' cannot be assigned to RHS: %s",
+                        identifier, ex.getMessage()), idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         }
         return null;
