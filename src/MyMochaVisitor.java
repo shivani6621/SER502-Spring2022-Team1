@@ -160,10 +160,9 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
-        //Boolean expr = Boolean.valueOf(visit(ctx.relational_expression()));
         Object expr= visit(ctx.relational_expression());
-        Object value1 = (visit(ctx.expression(1)).toString());
-        Object value2 = (visit(ctx.expression(2)).toString());
+        Object value1 = visit(ctx.expression(0));
+        Object value2 = visit(ctx.expression(1));
         if((boolean)expr == true){
             return value1;
         }
