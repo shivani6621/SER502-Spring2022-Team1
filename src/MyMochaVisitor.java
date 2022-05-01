@@ -1,6 +1,10 @@
 import org.antlr.v4.runtime.Token;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,12 +13,12 @@ import java.util.Map;
 public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     private final PrintStream outputStream;
-    private final List<String> semanticsErrors;
+    private final List<SemanticError> semanticErrorList;
     private final Map<String, Variable> variableMap;
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
-        this.semanticsErrors = new ArrayList<>();
+        this.semanticErrorList = new ArrayList<>();
         this.variableMap = new HashMap<>();
     }
 
@@ -41,6 +45,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
+        Token idToken = ctx.IDENTIFIER().getSymbol();
         String identifier = ctx.IDENTIFIER().getText();
         if (!variableMap.containsKey(identifier)) {
             try {
@@ -49,43 +54,35 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                     variable.setValue(visit(ctx.literal()));
                 variableMap.put(identifier, variable);
             } catch (Exception ex) {
-                outputStream.println("Err: failed to instantiate " + identifier);
-                semanticsErrors.add("Err: failed to instantiate " + identifier);
+                semanticErrorList.add(new SemanticError(String.format("variable '%s' initialization failed: %s",
+                        identifier, ex.getMessage()), idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         } else {
-            outputStream.println("Err: duplicate declare " + identifier);
-            semanticsErrors.add("Err: duplicate declare " + identifier);
+            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+                    idToken.getLine(), idToken.getCharPositionInLine() + 1));
         }
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
+    @Override public Object visitAssignment_statement(MochaParser.Assignment_statementContext ctx) {
         Token idToken = ctx.IDENTIFIER().getSymbol();
-        int line = idToken.getLine();
-        int column = idToken.getCharPositionInLine() + 1;
-
-        String id = ctx.IDENTIFIER().getText();
-        if (!variableMap.containsKey(id)) {
-//            outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
-            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+        String identifier = ctx.IDENTIFIER().getText();
+        if (!variableMap.containsKey(identifier)) {
+            semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+                    idToken.getLine(), idToken.getCharPositionInLine() + 1));
         } else {
-            // TYPE CHECKING HERE
-            Object rtn =  visit(ctx.expression());
-//            Var value = (Var) visit(ctx.expression());
             try {
-                variableMap.get(id).setValue(rtn);
+                // TODO: TYPE CHECKING
+                Object rtn =  visit(ctx.expression());
+                variableMap.get(identifier).setValue(rtn);
             } catch (Exception ex) {
-                // TODO: Record error that failed to assign value
+                // TODO: SEMANTIC ERROR
             }
-//            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
-//            variable.put(id, value);
         }
         return null;
     }
 
-    @Override
-    public Object visitExpression(MochaParser.ExpressionContext ctx) {
+    @Override public Object visitExpression(MochaParser.ExpressionContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -113,7 +110,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
-
         Double left = Double.valueOf(visit(ctx.expression_term(0)).toString()) ;
         Double right = Double.valueOf(visit(ctx.expression_term(1)).toString());
         String op = ctx.children.get(1).getText();
@@ -171,21 +167,16 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
         Object rtn;
         if (ctx.IDENTIFIER() != null) {
+            Token idToken = ctx.IDENTIFIER().getSymbol();
+            String identifier = ctx.IDENTIFIER().getText();
             if (!variableMap.containsKey(ctx.IDENTIFIER().getText())) {
-                Token idToken = ctx.IDENTIFIER().getSymbol();
-                int line = idToken.getLine();
-                int column = idToken.getCharPositionInLine() + 1;
-                String id = ctx.IDENTIFIER().getText();
-//                outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
-                semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+                semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+                        idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
-            String name = ctx.IDENTIFIER().getText();
-            rtn = variableMap.get(name).getValue();
-
+            rtn = variableMap.get(identifier).getValue();
         } else {
             rtn = visit(ctx.literal());
         }
-//        System.out.println("expression term: " + rtn);
         return rtn;
     }
 
@@ -217,31 +208,29 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitFor_statement(MochaParser.For_statementContext ctx) {
-        String var = ctx.for_expression().IDENTIFIER().getText();
-        if (variableMap.containsKey(var)) {
-            Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
-            int line = idToken.getLine();
-            int column = idToken.getCharPositionInLine() + 1;
-            String id = ctx.for_expression().IDENTIFIER().getText();
-            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
+        Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
+        String identifier = ctx.for_expression().IDENTIFIER().getText();
+        if (variableMap.containsKey(identifier)) {
+            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+                    idToken.getLine(), idToken.getCharPositionInLine() + 1));
             return null;
         }
+
         int start = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(0).getText());
         int end = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(1).getText());
 
-
         try {
-        Variable var1 = new Variable("int");
-            var1.setValue(start);
-            variableMap.put(var, var1);
+            Variable variable = new Variable("int");
+            variable.setValue(start);
+            variableMap.put(identifier, variable);
             for (int i = start; i < end; i++) {
-                variableMap.get(var).setValue(i);
+                variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
-        } catch(Exception ex) {
-            // TODO
+        } catch (Exception ex) {
+            // TODO : SEMANTIC ERROR
         }
-        variableMap.remove(var);
+        variableMap.remove(identifier);
         return null;
     }
 
@@ -256,49 +245,42 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 //            return null;
 //        }
         Object cond = visit(ctx.while_condition());
-        while ((boolean) cond){
-
+        while ((boolean) cond) {
             visit(ctx.body());
             cond = visit(ctx.while_condition());
         }
         return null;
     }
 
-    @Override
-    public Object visitWhile_condition(MochaParser.While_conditionContext ctx) {
-        if (ctx.relational_expression() != null) {
-            return visit(ctx.relational_expression());
-        } else {
-            return visit(ctx.logical_expression());
-        }
+    @Override public Object visitWhile_condition(MochaParser.While_conditionContext ctx) {
+       return ctx.relational_expression() != null ? visit(ctx.relational_expression()) : visit(ctx.logical_expression());
     }
 
     @Override
     public Object visitFor_in_range_statement(MochaParser.For_in_range_statementContext ctx) {
-        String var = ctx.IDENTIFIER().getText();
-        if (variableMap.containsKey(var)) {
-            Token idToken = ctx.IDENTIFIER().getSymbol();
-            int line = idToken.getLine();
-            int column = idToken.getCharPositionInLine() + 1;
-            String id = ctx.IDENTIFIER().getText();
-            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
+        Token idToken = ctx.IDENTIFIER().getSymbol();
+        String identifier = ctx.IDENTIFIER().getText();
+        if (variableMap.containsKey(identifier)) {
+            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+                    idToken.getLine(), idToken.getCharPositionInLine() + 1));
             return null;
         }
+
         int start = Integer.parseInt(ctx.range().INTEGER_LITERAL(0).getText());
         int end = Integer.parseInt(ctx.range().INTEGER_LITERAL(1).getText());
 
         try {
-            Variable var1 = new Variable("int");
-            var1.setValue(start);
-            variableMap.put(var, var1);
+            Variable variable = new Variable("int");
+            variable.setValue(start);
+            variableMap.put(identifier, variable);
             for (int i = start; i < end; i++) {
-                variableMap.get(var).setValue(i);
+                variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
         } catch (Exception ex) {
-            // TODO
+            // TODO: SEMANTIC ERROR
         }
-        variableMap.remove(var);
+        variableMap.remove(identifier);
         return null;
     }
 
@@ -307,6 +289,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
+    private StringBuilder printBuffer = new StringBuilder();
     @Override public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
         visit(ctx.print_argument_list());
         return null;
@@ -314,16 +297,20 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
         if (ctx.IDENTIFIER() != null) {
+            Token idToken = ctx.IDENTIFIER().getSymbol();
             String identifier = ctx.IDENTIFIER().getText();
             if (variableMap.containsKey(identifier)) {
-                outputStream.print(variableMap.get(identifier).getValue());
-            } else outputStream.print(identifier);
-        } else if (ctx.literal() != null) outputStream.print(visit(ctx.literal()));
-        else semanticsErrors.add("can not print null ");
-
-//         if (ctx.print_argument_list() != null) {
-//             visit(ctx.print_argument_list());
-//         }
+                // outputStream.print(variableMap.get(identifier).getValue());
+                printBuffer.append(variableMap.get(identifier).getValue());
+            } else {
+                semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+                        idToken.getLine(), idToken.getCharPositionInLine() + 1));
+            }
+        } else if (ctx.literal() != null) {
+            // outputStream.print(visit(ctx.literal()));
+            printBuffer.append(visit(ctx.literal()));
+        }
+        // else semanticsErrors.add("can not print null "); // TODO: DO WE REALLY NEED THIS ? I THINK THIS BRANCH WOULD NEVER BE HIT
         return visitChildren(ctx);
     }
 
@@ -332,25 +319,25 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         if (ctx.INTEGER_LITERAL() != null) return Integer.parseInt(literal);
         else if (ctx.FLOATING_POINT_LITERAL() != null) return Double.parseDouble(literal);
         else if (ctx.BOOLEAN_LITERAL() != null) return Boolean.parseBoolean(literal);
-        else return literal.substring(1, literal.length() - 1);
+        else return literal.substring(1, literal.length() - 1); // TODO: BETTER WAY TO REMOVE THE ENCLOSING QUOTES ?
     }
 
     @Override public Object visitData_type(MochaParser.Data_typeContext ctx) {
         return visitChildren(ctx);
     }
 
-    public void printResults() {
-        if (semanticsErrors.size() == 0) {
-            outputStream.println("Compiled successfully");
-//            printEnvironment();
+    public void printEvaluationResults() {
+        if (semanticErrorList.size() == 0) {
+            outputStream.println("Program Evaluation Successful.");
+            outputStream.println(printBuffer.toString());
         } else {
-            for (String semanticsError : semanticsErrors) {
+            outputStream.println("Program Evaluation Failed. Please Correct The Following Errors:");
+            for (SemanticError semanticsError : semanticErrorList)
                 outputStream.println(semanticsError);
-            }
         }
     }
 
     public Map<String, Variable> getVariableMap() {
         return variableMap;
-    };
+    }
 }

@@ -74,18 +74,16 @@ public class MainFrame extends JFrame {
         CommonTokenStream commonTokenStream = new CommonTokenStream(mochaLexer);
         MochaParser mochaParser = new MochaParser(commonTokenStream);
         ParseTree parseTree = mochaParser.program();
-        jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\nProgram Output:\n");
+        jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\n");
 
         PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
         MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
         myMochaVisitor.visit(parseTree);
 
-        myMochaVisitor.printResults();
+        myMochaVisitor.printEvaluationResults();
         for (Map.Entry<String, Variable> variableEntry : myMochaVisitor.getVariableMap().entrySet()) {
             Variable variable = variableEntry.getValue();
             modelEnvironment.addRow(new Object[] { variableEntry.getKey(), variable.getType(), variable.getValue() });
         }
-
-        // ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
     }
 }
