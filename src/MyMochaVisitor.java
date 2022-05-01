@@ -260,6 +260,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         Object cond = visit(ctx.while_condition());
         while ((boolean) cond){
             visit(ctx.statement());
+            cond = visit(ctx.while_condition());
         }
         return null;
     }
