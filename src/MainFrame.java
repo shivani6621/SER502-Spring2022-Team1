@@ -70,6 +70,8 @@ public class MainFrame extends JFrame {
 
     private void run() {
         jTextAreaProgramOutput.setText("");
+        modelEnvironment.setRowCount(0);
+
         MochaLexer mochaLexer = new MochaLexer(CharStreams.fromString(jTextAreaCodeEditor.getText()));
         CommonTokenStream commonTokenStream = new CommonTokenStream(mochaLexer);
         MochaParser mochaParser = new MochaParser(commonTokenStream);
