@@ -252,11 +252,25 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
-        return visitChildren(ctx);
+        visit(ctx.print_argument_list());
+        return null;
     }
 
     @Override
     public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
+        if (ctx.IDENTIFIER()!= null) {
+            String identifier =  ctx.IDENTIFIER().getText();
+            if (variable.containsKey(identifier)){
+                outputStream.println(variable.get(identifier).getValue());
+            }else
+                outputStream.println(identifier);
+        }else if (ctx.LITERAL()!= null){
+            outputStream.println(ctx.LITERAL().getText());
+        }else
+            semanticsErrors.add("can not print null ");
+        if (ctx.print_argument_list() != null) {
+            visit(ctx.print_argument_list());
+        }
         return visitChildren(ctx);
     }
 
@@ -265,8 +279,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             outputStream.println("Compiled successfully");
             printEnvironment();
         }else {
-            for (int i = 0; i < semanticsErrors.size(); i++){
-                outputStream.println(semanticsErrors.get(i));
+            for (String semanticsError : semanticsErrors) {
+                outputStream.println(semanticsError);
             }
         }
     }
