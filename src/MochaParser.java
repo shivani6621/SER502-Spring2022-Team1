@@ -1167,9 +1167,9 @@ public class MochaParser extends Parser {
 	public static class For_expressionContext extends ParserRuleContext {
 		public TerminalNode IDENTIFIER() { return getToken(MochaParser.IDENTIFIER, 0); }
 		public TerminalNode OP_ASSIGN() { return getToken(MochaParser.OP_ASSIGN, 0); }
-		public List<TerminalNode> INTEGER_LITERAL() { return getTokens(MochaParser.INTEGER_LITERAL); }
-		public TerminalNode INTEGER_LITERAL(int i) {
-			return getToken(MochaParser.INTEGER_LITERAL, i);
+		public List<TerminalNode> LITERAL() { return getTokens(MochaParser.LITERAL); }
+		public TerminalNode LITERAL(int i) {
+			return getToken(MochaParser.LITERAL, i);
 		}
 		public For_expressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1201,11 +1201,11 @@ public class MochaParser extends Parser {
 			setState(147);
 			match(OP_ASSIGN);
 			setState(148);
-			match(INTEGER_LITERAL);
+			match(LITERAL);
 			setState(149);
 			match(T__10);
 			setState(150);
-			match(INTEGER_LITERAL);
+			match(LITERAL);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1395,9 +1395,9 @@ public class MochaParser extends Parser {
 	}
 
 	public static class RangeContext extends ParserRuleContext {
-		public List<TerminalNode> INTEGER_LITERAL() { return getTokens(MochaParser.INTEGER_LITERAL); }
-		public TerminalNode INTEGER_LITERAL(int i) {
-			return getToken(MochaParser.INTEGER_LITERAL, i);
+		public List<TerminalNode> LITERAL() { return getTokens(MochaParser.LITERAL); }
+		public TerminalNode LITERAL(int i) {
+			return getToken(MochaParser.LITERAL, i);
 		}
 		public RangeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1425,11 +1425,11 @@ public class MochaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(170);
-			match(INTEGER_LITERAL);
+			match(LITERAL);
 			setState(171);
 			match(T__2);
 			setState(172);
-			match(INTEGER_LITERAL);
+			match(LITERAL);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1681,8 +1681,8 @@ public class MochaParser extends Parser {
 		"\u008e\u0003\u001e\u000f\u0000\u008e\u008f\u0005\u0007\u0000\u0000\u008f"+
 		"\u0090\u0003\u0004\u0002\u0000\u0090\u0091\u0005\b\u0000\u0000\u0091\u001d"+
 		"\u0001\u0000\u0000\u0000\u0092\u0093\u0005,\u0000\u0000\u0093\u0094\u0005"+
-		"\u001c\u0000\u0000\u0094\u0095\u0005\u0015\u0000\u0000\u0095\u0096\u0005"+
-		"\u000b\u0000\u0000\u0096\u0097\u0005\u0015\u0000\u0000\u0097\u001f\u0001"+
+		"\u001c\u0000\u0000\u0094\u0095\u0005\u0014\u0000\u0000\u0095\u0096\u0005"+
+		"\u000b\u0000\u0000\u0096\u0097\u0005\u0014\u0000\u0000\u0097\u001f\u0001"+
 		"\u0000\u0000\u0000\u0098\u0099\u0005\f\u0000\u0000\u0099\u009a\u0003\""+
 		"\u0011\u0000\u009a\u009b\u0005\u0007\u0000\u0000\u009b\u009c\u0003\u0004"+
 		"\u0002\u0000\u009c\u009d\u0005\b\u0000\u0000\u009d!\u0001\u0000\u0000"+
@@ -1692,8 +1692,8 @@ public class MochaParser extends Parser {
 		"\u00a4\u0005,\u0000\u0000\u00a4\u00a5\u0005\r\u0000\u0000\u00a5\u00a6"+
 		"\u0003&\u0013\u0000\u00a6\u00a7\u0005\u0007\u0000\u0000\u00a7\u00a8\u0003"+
 		"\u0004\u0002\u0000\u00a8\u00a9\u0005\b\u0000\u0000\u00a9%\u0001\u0000"+
-		"\u0000\u0000\u00aa\u00ab\u0005\u0015\u0000\u0000\u00ab\u00ac\u0005\u0003"+
-		"\u0000\u0000\u00ac\u00ad\u0005\u0015\u0000\u0000\u00ad\'\u0001\u0000\u0000"+
+		"\u0000\u0000\u00aa\u00ab\u0005\u0014\u0000\u0000\u00ab\u00ac\u0005\u0003"+
+		"\u0000\u0000\u00ac\u00ad\u0005\u0014\u0000\u0000\u00ad\'\u0001\u0000\u0000"+
 		"\u0000\u00ae\u00af\u0005\u000e\u0000\u0000\u00af\u00b0\u0003*\u0015\u0000"+
 		"\u00b0)\u0001\u0000\u0000\u0000\u00b1\u00b4\u0005\u0014\u0000\u0000\u00b2"+
 		"\u00b3\u0005\u0003\u0000\u0000\u00b3\u00b5\u0003*\u0015\u0000\u00b4\u00b2"+

@@ -49,13 +49,13 @@ if_else_statement : 'if' if_condition '{' statement '}' ('else' '{' statement '}
 if_condition: relational_expression | logical_expression ;
 
 for_statement : 'for' for_expression '{' statement '}' ;
-for_expression : IDENTIFIER OP_ASSIGN INTEGER_LITERAL 'to' INTEGER_LITERAL ;
+for_expression : IDENTIFIER OP_ASSIGN LITERAL 'to' LITERAL ;
 
 while_statement: 'while' while_condition '{' statement '}' ;
 while_condition: relational_expression | logical_expression ;
 
 for_in_range_statement: 'for' IDENTIFIER 'in' range '{' statement '}' ;
-range : INTEGER_LITERAL ',' INTEGER_LITERAL ;
+range : LITERAL ',' LITERAL ;
 
 print_statement: 'print' print_argument_list ;
 print_argument_list
