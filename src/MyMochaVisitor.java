@@ -1,4 +1,5 @@
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -80,24 +81,52 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-        if (ctx.arithmetic_expression().size() < 2) {
+        if (ctx.arithmetic_expression().size() < 2)
             return visitChildren(ctx);
-        }
-        String op = ctx.children.get(1).getText();
-        Double left = Double.valueOf(visit(ctx.arithmetic_expression(0)).toString()) ;
 
-        Double right = Double.valueOf(visit(ctx.arithmetic_expression(1)).toString()) ;
-        Double rtn = 0.0;
-        if (op.equals("+")) {
-            rtn = left + right;
-        } else if (op.equals("-")) {
-            rtn = left - right;
-        } else if (op.equals("*")) {
-            rtn = left * right;
-        } else if (op.equals("/")) {
-            rtn = left / right;
+        Object leftOperand = visit(ctx.arithmetic_expression(0));
+        Object rightOperand = visit(ctx.arithmetic_expression(1));
+
+        TerminalNode operatorNode = ctx.OP_ADD() != null ? ctx.OP_ADD()
+                : ctx.OP_SUB() != null ? ctx.OP_SUB()
+                : ctx.OP_MUL() != null ? ctx.OP_MUL()
+                : ctx.OP_DIV();
+        Token operatorToken = operatorNode.getSymbol();
+        String operator = operatorNode.getText();
+
+        if ((leftOperand instanceof Integer || leftOperand instanceof Double) &&
+                (rightOperand instanceof Integer || rightOperand instanceof Double)) {
+
+            if (leftOperand instanceof Integer && rightOperand instanceof Integer) { // INTEGER ARITHMETIC
+                int leftOperandInt = (Integer) leftOperand;
+                double rightOperandInt = (Integer) rightOperand;
+
+                if (operator.equals("+")) return leftOperandInt + rightOperandInt;
+                else if (operator.equals("-")) return leftOperandInt - rightOperandInt;
+                else if (operator.equals("*")) return leftOperandInt * rightOperandInt;
+                else if (operator.equals("/")) {
+                    if (rightOperandInt != 0) return leftOperandInt / rightOperandInt;
+                    else semanticErrorList.add(new SemanticError("divide by zero", operatorToken.getLine(),
+                            operatorToken.getCharPositionInLine() + 1));
+                }
+            } else { // FLOATING POINT ARITHMETIC
+                double leftOperandDouble = leftOperand instanceof Double ? (Double)leftOperand : ((Integer)leftOperand).doubleValue();
+                double rightOperandDouble = rightOperand instanceof Double ? (Double)rightOperand : ((Integer)rightOperand).doubleValue();
+
+                if (operator.equals("+")) return leftOperandDouble + rightOperandDouble;
+                else if (operator.equals("-")) return leftOperandDouble - rightOperandDouble;
+                else if (operator.equals("*")) return leftOperandDouble * rightOperandDouble;
+                else if (operator.equals("/")) {
+                    if (rightOperandDouble != 0.0) return leftOperandDouble / rightOperandDouble;
+                    else semanticErrorList.add(new SemanticError("divide by zero",  operatorToken.getLine(),
+                            operatorToken.getCharPositionInLine() + 1));
+                }
+            }
+        } else {
+            semanticErrorList.add(new SemanticError("unsupported operands in arithmetic expression",
+                    operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
         }
-        return rtn;
+        return null;
     }
 
     @Override
