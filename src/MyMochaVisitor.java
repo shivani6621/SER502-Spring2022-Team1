@@ -108,7 +108,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             return visitChildren(ctx);
         }
         String op = ctx.children.get(1).getText();
-        System.out.println("ctx " + ctx.getText());
+//        System.out.println("ctx " + ctx.getText());
         Double left = Double.valueOf(visit(ctx.arithmetic_expression(0)).toString()) ;
 
         Double right = Double.valueOf(visit(ctx.arithmetic_expression(1)).toString()) ;
@@ -128,8 +128,22 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
 
-        //Value left = this.visit
-        return visitChildren(ctx);
+        Double left = Double.valueOf(ctx.expression_term(0).getText());
+        Double right = Double.valueOf(ctx.expression_term(1).getText());
+        String op = ctx.children.get(1).getText();
+        if (op.equals("<")) {
+            return left < right;
+        } else if (op.equals(">")) {
+            return left > right;
+        } else if (op.equals("<=")) {
+            return left <= right;
+        } else if (op.equals(">=")) {
+            return left >= right;
+        } else if (op.equals("==")) {
+            return left.equals(right);
+        }else {
+            return null;
+        }
     }
 
     @Override
