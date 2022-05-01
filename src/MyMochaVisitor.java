@@ -56,8 +56,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
         if (!variable.containsKey(idToken)){
-            Var var = new Var();
-            var.setDataType(data_type);
+            Var var = new Var(data_type);
             variable.put(idToken,var);
         }else {
             outputStream.println("Err: duplicate declare " + idToken);
@@ -83,9 +82,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
         } else {
             // TYPE CHECKING HERE
-            Var value = (Var) visit(ctx.expression());
-            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
-            variable.put(id, value);
+            Object rtn =  visit(ctx.expression());
+//            Var value = (Var) visit(ctx.expression());
+            variable.get(id).setValue(rtn);
+//            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
+//            variable.put(id, value);
         }
         return null;
     }
@@ -97,7 +98,31 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-        return visitChildren(ctx);
+//        System.out.println("expression op: " + ctx.children.get(1).getText());
+//        System.out.println("ctx.children.size(): " + ctx.children.size());
+//        System.out.println("ctx " + ctx.getText());
+//        if (ctx.children.size() != 3) {
+//            return visitChildren(ctx);
+//        }
+        if (ctx.arithmetic_expression().size() < 2) {
+            return visitChildren(ctx);
+        }
+        String op = ctx.children.get(1).getText();
+        System.out.println("ctx " + ctx.getText());
+        Double left = Double.valueOf(visit(ctx.arithmetic_expression(0)).toString()) ;
+
+        Double right = Double.valueOf(visit(ctx.arithmetic_expression(1)).toString()) ;
+        Double rtn = 0.0;
+        if (op.equals("+")) {
+            rtn = left + right;
+        } else if (op.equals("-")) {
+            rtn = left - right;
+        } else if (op.equals("*")) {
+            rtn = left * right;
+        } else if (op.equals("/")) {
+            rtn = left / right;
+        }
+        return rtn;
     }
 
     @Override
@@ -133,6 +158,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         } else {
             rtn = ctx.LITERAL().getText();
         }
+        System.out.println("expression term: " + rtn);
         return rtn;
     }
 

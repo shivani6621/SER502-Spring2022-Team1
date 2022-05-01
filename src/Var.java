@@ -2,6 +2,10 @@ public class Var {
     private String dataType;
     private Object value;
 
+    public Var(String dataType) {
+        this.dataType = dataType;
+    }
+
     public String getDataType() {
         return dataType;
     }
