@@ -38,9 +38,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitBody(MochaParser.BodyContext ctx) {
-        outputStream.println("Visiting Body ...");
-        System.out.println(ctx.getText());
-        System.out.println("there are " + ctx.statement().size() + " statements");
 //        for (MochaParser.StatementContext statementContext : ctx.statement()) {
 //            System.out.println("statementContext: " + statementContext.getText());
 //            visitChildren(statementContext);
@@ -187,5 +184,24 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
         return visitChildren(ctx);
+    }
+
+    public void printResults() {
+        if (semanticsErrors.size() == 0){
+            outputStream.println("Compiled successfully");
+            printEnvironment();
+        }else {
+            for (int i = 0; i <= semanticsErrors.size(); i++){
+                outputStream.println(semanticsErrors.get(i));
+            }
+        }
+    }
+
+    public void printEnvironment() {
+        for (Map.Entry<String, Var> set :
+                variable.entrySet()) {
+            outputStream.println(set.getKey() + " = "
+                    + set.getValue().getValue());
+        }
     }
 }

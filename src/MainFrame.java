@@ -65,6 +65,7 @@ public class MainFrame extends JFrame {
         PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
         MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
         myMochaVisitor.visit(parseTree);
+        myMochaVisitor.printResults();
 
         // ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
     }
