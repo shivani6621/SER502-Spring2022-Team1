@@ -1,9 +1,6 @@
-import com.sun.jdi.Value;
 import org.antlr.v4.runtime.Token;
 
-import javax.sound.midi.Soundbank;
 import java.io.PrintStream;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,26 +8,14 @@ import java.util.Map;
 
 public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
-    /* TODO: Need to store the variables in a map (Our environment). We can either store all of the variable values in
-        one single map or we can store int, float, boolean and string values in four separate maps.
-        Method 1:
-            private Map<String, Object> variableMap = new HashMap<>();
-        Method2:
-            private Map<String, Integer> intVariableMap = new HashMap<>();
-            private Map<String, Float> floatVariableMap = new HashMap<>();
-            private Map<String, Boolean> booleanVariableMap = new HashMap<>();
-            private Map<String, String> stringVariableMap = new HashMap<>();
-    */
-
-
     private final PrintStream outputStream;
-    private List<String> semanticsErrors;
-    private Map<String, Var> variable;
+    private final List<String> semanticsErrors;
+    private final Map<String, Variable> variableMap;
 
     public MyMochaVisitor(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.semanticsErrors = new ArrayList<>();
-        this.variable = new HashMap<String, Var>();
+        this.variableMap = new HashMap<>();
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {
@@ -45,29 +30,32 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
-
-    @Override
-    public Object visitStatement(MochaParser.StatementContext ctx) {
+    @Override public Object visitStatement(MochaParser.StatementContext ctx) {
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+    private String variableDeclarationDataType = null;
+    @Override public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+        variableDeclarationDataType = ctx.data_type().getText();
+        return visitChildren(ctx);
+    }
 
-        String data_type = ctx.data_type().getText();
-        String idToken = ctx.identifier_list().getText();
-        if (!variable.containsKey(idToken)){
-            Var var = new Var(data_type);
-            variable.put(idToken,var);
-        }else {
-//            outputStream.println("Err: duplicate declare " + idToken);
-            semanticsErrors.add("Err: duplicate declare " + idToken);
+    @Override public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
+        String identifier = ctx.IDENTIFIER().getText();
+        if (!variableMap.containsKey(identifier)) {
+            try {
+                Variable variable = new Variable(variableDeclarationDataType);
+                if (ctx.OP_ASSIGN() != null)
+                    variable.setValue(ctx.literal().getText());
+                variableMap.put(identifier, variable);
+            } catch (Exception ex) {
+                outputStream.println("Err: failed to instantiate " + identifier);
+                semanticsErrors.add("Err: failed to instantiate " + identifier);
+            }
+        } else {
+            outputStream.println("Err: duplicate declare " + identifier);
+            semanticsErrors.add("Err: duplicate declare " + identifier);
         }
-        return visitChildren(ctx);
-    }
-
-    @Override
-    public Object visitIdentifier_list(MochaParser.Identifier_listContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -78,14 +66,18 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         int column = idToken.getCharPositionInLine() + 1;
 
         String id = ctx.IDENTIFIER().getText();
-        if (!variable.containsKey(id)) {
+        if (!variableMap.containsKey(id)) {
 //            outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
         } else {
             // TYPE CHECKING HERE
             Object rtn =  visit(ctx.expression());
 //            Var value = (Var) visit(ctx.expression());
-            variable.get(id).setValue(rtn);
+            try {
+                variableMap.get(id).setValue(rtn);
+            } catch (Exception ex) {
+                // TODO: Record error that failed to assign value
+            }
 //            System.out.println("value: " + value.getValue() + " type: " + value.getDataType());
 //            variable.put(id, value);
         }
@@ -179,7 +171,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
         Object rtn;
         if (ctx.IDENTIFIER() != null) {
-            if (!variable.containsKey(ctx.IDENTIFIER().getText())) {
+            if (!variableMap.containsKey(ctx.IDENTIFIER().getText())) {
                 Token idToken = ctx.IDENTIFIER().getSymbol();
                 int line = idToken.getLine();
                 int column = idToken.getCharPositionInLine() + 1;
@@ -188,7 +180,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
             }
             String name = ctx.IDENTIFIER().getText();
-            rtn = variable.get(name).getValue();
+            rtn = variableMap.get(name).getValue();
 
         } else {
             rtn = visit(ctx.literal());
@@ -226,7 +218,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitFor_statement(MochaParser.For_statementContext ctx) {
         String var = ctx.for_expression().IDENTIFIER().getText();
-        if (variable.containsKey(var)) {
+        if (variableMap.containsKey(var)) {
             Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
             int line = idToken.getLine();
             int column = idToken.getCharPositionInLine() + 1;
@@ -236,14 +228,20 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         }
         int start = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(0).getText());
         int end = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(1).getText());
-        Var var1 = new Var("int");
-        var1.setValue(start);
-        variable.put(var, var1);
-        for (int i = start; i < end; i++) {
-            variable.get(var).setValue(i);
-            visit(ctx.body());
+
+
+        try {
+        Variable var1 = new Variable("int");
+            var1.setValue(start);
+            variableMap.put(var, var1);
+            for (int i = start; i < end; i++) {
+                variableMap.get(var).setValue(i);
+                visit(ctx.body());
+            }
+        } catch(Exception ex) {
+            // TODO
         }
-        variable.remove(var);
+        variableMap.remove(var);
         return null;
     }
 
@@ -278,7 +276,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitFor_in_range_statement(MochaParser.For_in_range_statementContext ctx) {
         String var = ctx.IDENTIFIER().getText();
-        if (variable.containsKey(var)) {
+        if (variableMap.containsKey(var)) {
             Token idToken = ctx.IDENTIFIER().getSymbol();
             int line = idToken.getLine();
             int column = idToken.getCharPositionInLine() + 1;
@@ -288,14 +286,19 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         }
         int start = Integer.parseInt(ctx.range().INTEGER_LITERAL(0).getText());
         int end = Integer.parseInt(ctx.range().INTEGER_LITERAL(1).getText());
-        Var var1 = new Var("int");
-        var1.setValue(start);
-        variable.put(var, var1);
-        for (int i = start; i < end; i++) {
-            variable.get(var).setValue(i);
-            visit(ctx.body());
+
+        try {
+            Variable var1 = new Variable("int");
+            var1.setValue(start);
+            variableMap.put(var, var1);
+            for (int i = start; i < end; i++) {
+                variableMap.get(var).setValue(i);
+                visit(ctx.body());
+            }
+        } catch (Exception ex) {
+            // TODO
         }
-        variable.remove(var);
+        variableMap.remove(var);
         return null;
     }
 
@@ -314,8 +317,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
         if (ctx.IDENTIFIER()!= null) {
             String identifier =  ctx.IDENTIFIER().getText();
-            if (variable.containsKey(identifier)){
-                outputStream.println(variable.get(identifier).getValue());
+            if (variableMap.containsKey(identifier)){
+                outputStream.println(variableMap.get(identifier).getValue());
             }else
                 outputStream.println(identifier);
         }else if (ctx.literal()!= null){
@@ -339,7 +342,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     public void printResults() {
-        if (semanticsErrors.size() == 0){
+        if (semanticsErrors.size() == 0) {
             outputStream.println("Compiled successfully");
             printEnvironment();
         }else {
@@ -350,10 +353,9 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     public void printEnvironment() {
-        for (Map.Entry<String, Var> set :
-                variable.entrySet()) {
-            outputStream.println(set.getKey() + " = "
-                    + set.getValue().getValue());
+        for (Map.Entry<String, Variable> variableEntry : variableMap.entrySet()) {
+            Variable variable = variableEntry.getValue();
+            outputStream.println(variableEntry.getKey() + "(" + variable.getType() + ") = "  + variable.getValue());
         }
     }
 }
