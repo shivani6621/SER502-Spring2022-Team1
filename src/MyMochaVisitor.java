@@ -54,13 +54,13 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
 
-        String data_type = ctx.DATA_TYPE().getText();
+        String data_type = ctx.data_type().getText();
         String idToken = ctx.identifier_list().getText();
         if (!variable.containsKey(idToken)){
             Var var = new Var(data_type);
             variable.put(idToken,var);
         }else {
-            outputStream.println("Err: duplicate declare " + idToken);
+//            outputStream.println("Err: duplicate declare " + idToken);
             semanticsErrors.add("Err: duplicate declare " + idToken);
         }
         return visitChildren(ctx);
@@ -79,7 +79,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
         String id = ctx.IDENTIFIER().getText();
         if (!variable.containsKey(id)) {
-            outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+//            outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
         } else {
             // TYPE CHECKING HERE
@@ -184,16 +184,16 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 int line = idToken.getLine();
                 int column = idToken.getCharPositionInLine() + 1;
                 String id = ctx.IDENTIFIER().getText();
-                outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+//                outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
                 semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
             }
             String name = ctx.IDENTIFIER().getText();
             rtn = variable.get(name).getValue();
 
         } else {
-            rtn = ctx.LITERAL();
+            rtn = visit(ctx.literal());
         }
-        System.out.println("expression term: " + rtn);
+//        System.out.println("expression term: " + rtn);
         return rtn;
     }
 
@@ -205,10 +205,10 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         System.out.println("if_else_statement" + ctx.getText());
         Object cond = visit(ctx.if_condition());
         if ((boolean)cond) {
-            visit(ctx.statement(0));
+            visit(ctx.body(0));
         } else {
-            if (ctx.statement(1) != null) {
-                visit(ctx.statement(1));
+            if (ctx.body(1) != null) {
+                visit(ctx.body(1));
             }
         }
         return null;
@@ -234,14 +234,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
             return null;
         }
-        int start = Integer.parseInt(ctx.for_expression().LITERAL(0).getText());
-        int end = Integer.parseInt(ctx.for_expression().LITERAL(1).getText());
+        int start = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(0).getText());
+        int end = Integer.parseInt(ctx.for_expression().INTEGER_LITERAL(1).getText());
         Var var1 = new Var("int");
         var1.setValue(start);
         variable.put(var, var1);
         for (int i = start; i < end; i++) {
             variable.get(var).setValue(i);
-            visit(ctx.statement());
+            visit(ctx.body());
         }
         variable.remove(var);
         return null;
@@ -254,12 +254,13 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
-        if (ctx.while_condition() == null) {
-            return null;
-        }
+//        if (ctx.while_condition() == null) {
+//            return null;
+//        }
         Object cond = visit(ctx.while_condition());
         while ((boolean) cond){
-            visit(ctx.statement());
+
+            visit(ctx.body());
             cond = visit(ctx.while_condition());
         }
         return null;
@@ -285,14 +286,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
             return null;
         }
-        int start = Integer.parseInt(ctx.range().LITERAL(0).getText());
-        int end = Integer.parseInt(ctx.range().LITERAL(1).getText());
+        int start = Integer.parseInt(ctx.range().INTEGER_LITERAL(0).getText());
+        int end = Integer.parseInt(ctx.range().INTEGER_LITERAL(1).getText());
         Var var1 = new Var("int");
         var1.setValue(start);
         variable.put(var, var1);
         for (int i = start; i < end; i++) {
             variable.get(var).setValue(i);
-            visit(ctx.statement());
+            visit(ctx.body());
         }
         variable.remove(var);
         return null;
@@ -317,13 +318,23 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 outputStream.println(variable.get(identifier).getValue());
             }else
                 outputStream.println(identifier);
-        }else if (ctx.LITERAL()!= null){
-            outputStream.println(ctx.LITERAL().getText());
+        }else if (ctx.literal()!= null){
+            outputStream.println(ctx.literal().getText());
         }else
             semanticsErrors.add("can not print null ");
         if (ctx.print_argument_list() != null) {
             visit(ctx.print_argument_list());
         }
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public Object visitLiteral(MochaParser.LiteralContext ctx) {
+        return ctx.getChild(0);
+    }
+
+    @Override
+    public Object visitData_type(MochaParser.Data_typeContext ctx) {
         return visitChildren(ctx);
     }
 

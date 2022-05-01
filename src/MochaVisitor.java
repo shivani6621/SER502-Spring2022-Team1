@@ -141,4 +141,16 @@ public interface MochaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrint_argument_list(MochaParser.Print_argument_listContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MochaParser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteral(MochaParser.LiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MochaParser#data_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitData_type(MochaParser.Data_typeContext ctx);
 }
