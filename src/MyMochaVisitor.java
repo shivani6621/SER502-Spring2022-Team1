@@ -224,9 +224,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitFor_statement(MochaParser.For_statementContext ctx) {
         String var = ctx.for_expression().IDENTIFIER().getText();
         int start = Integer.parseInt(ctx.for_expression().LITERAL(0).getText());
-        System.out.println("start: " + start);
         int end = Integer.parseInt(ctx.for_expression().LITERAL(1).getText());
-        System.out.println("end: " + end);
         Var var1 = new Var("int");
         var1.setValue(start);
         variable.put(var, var1);
