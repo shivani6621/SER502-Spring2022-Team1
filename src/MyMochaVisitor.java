@@ -1,6 +1,9 @@
 import com.sun.jdi.Value;
 import org.antlr.v4.runtime.Token;
+
+import javax.sound.midi.Soundbank;
 import java.io.PrintStream;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,7 +122,21 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        return visitChildren(ctx);
+        String rtn;
+        if (ctx.IDENTIFIER() != null) {
+            if (!variable.containsKey(ctx.IDENTIFIER().getText())) {
+                Token idToken = ctx.IDENTIFIER().getSymbol();
+                int line = idToken.getLine();
+                int column = idToken.getCharPositionInLine() + 1;
+                String id = ctx.IDENTIFIER().getText();
+                outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+                semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
+            }
+            rtn = ctx.IDENTIFIER().getText();
+        } else {
+            rtn = ctx.LITERAL().getText();
+        }
+        return rtn;
     }
 
     @Override
