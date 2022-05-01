@@ -20,9 +20,9 @@ assignment_statement : IDENTIFIER OP_ASSIGN expression;
 
 /* EXPRESSION DEFINITION */
 expression
-    : arithmetic_expression
+    : logical_expression
+    | arithmetic_expression
     | relational_expression
-    | logical_expression
     | ternary_expression ;
 
 arithmetic_expression :
@@ -102,9 +102,9 @@ OP_SMALLER_EQUALS : '<=';
 OP_GREATER_EQUALS : '>=';
 
 /* LOGICAL OPERATOR DEFINITIONS */
-OP_LOGICAL_AND : 'and';
-OP_LOGICAL_OR  : 'or';
-OP_LOGICAL_NOT : 'not';
+OP_LOGICAL_AND : '&&';
+OP_LOGICAL_OR  : '||';
+OP_LOGICAL_NOT : '!';
 
 /* TERNARY OPERATOR DEFINITIONS */
 OP_TERNARY_TRUE  : '?' ;
