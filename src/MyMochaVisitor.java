@@ -46,7 +46,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             try {
                 Variable variable = new Variable(variableDeclarationDataType);
                 if (ctx.OP_ASSIGN() != null)
-                    variable.setValue(ctx.literal().getText());
+                    variable.setValue(visit(ctx.literal()));
                 variableMap.put(identifier, variable);
             } catch (Exception ex) {
                 outputStream.println("Err: failed to instantiate " + identifier);
@@ -307,37 +307,35 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
+    @Override public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
         visit(ctx.print_argument_list());
         return null;
     }
 
-    @Override
-    public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
-        if (ctx.IDENTIFIER()!= null) {
-            String identifier =  ctx.IDENTIFIER().getText();
-            if (variableMap.containsKey(identifier)){
-                outputStream.println(variableMap.get(identifier).getValue());
-            }else
-                outputStream.println(identifier);
-        }else if (ctx.literal()!= null){
-            outputStream.println(ctx.literal().getText());
-        }else
-            semanticsErrors.add("can not print null ");
-        if (ctx.print_argument_list() != null) {
-            visit(ctx.print_argument_list());
-        }
+    @Override public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
+        if (ctx.IDENTIFIER() != null) {
+            String identifier = ctx.IDENTIFIER().getText();
+            if (variableMap.containsKey(identifier)) {
+                outputStream.print(variableMap.get(identifier).getValue());
+            } else outputStream.print(identifier);
+        } else if (ctx.literal() != null) outputStream.print(visit(ctx.literal()));
+        else semanticsErrors.add("can not print null ");
+
+//         if (ctx.print_argument_list() != null) {
+//             visit(ctx.print_argument_list());
+//         }
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitLiteral(MochaParser.LiteralContext ctx) {
-        return ctx.getChild(0);
+    @Override public Object visitLiteral(MochaParser.LiteralContext ctx) {
+        String literal = ctx.getChild(0).getText();
+        if (ctx.INTEGER_LITERAL() != null) return Integer.parseInt(literal);
+        else if (ctx.FLOATING_POINT_LITERAL() != null) return Double.parseDouble(literal);
+        else if (ctx.BOOLEAN_LITERAL() != null) return Boolean.parseBoolean(literal);
+        else return literal.substring(1, literal.length() - 1);
     }
 
-    @Override
-    public Object visitData_type(MochaParser.Data_typeContext ctx) {
+    @Override public Object visitData_type(MochaParser.Data_typeContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -345,7 +343,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         if (semanticsErrors.size() == 0) {
             outputStream.println("Compiled successfully");
             printEnvironment();
-        }else {
+        } else {
             for (String semanticsError : semanticsErrors) {
                 outputStream.println(semanticsError);
             }
