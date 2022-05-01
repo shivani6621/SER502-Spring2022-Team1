@@ -1,5 +1,6 @@
 public class Var {
     private String dataType;
+    private Object value;
 
     public String getDataType() {
         return dataType;
@@ -9,13 +10,15 @@ public class Var {
         this.dataType = dataType;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
-    private String value;
+    public boolean typeCheck(String leftType, String rightType){
+        return leftType.equals(rightType);
+    }
 }

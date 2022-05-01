@@ -34,7 +34,6 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitProgram(MochaParser.ProgramContext ctx) {
-        outputStream.println("Visiting Program ...");
         return visitChildren(ctx);
     }
 
@@ -59,10 +58,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
         String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
-        Var var = new Var();
-        var.setDataType(data_type);
-        var.setValue("");
-        variable.put(idToken,var);
+        if (!variable.containsKey(idToken)){
+            Var var = new Var();
+            var.setDataType(data_type);
+            variable.put(idToken,var);
+        }else {
+            outputStream.println("Err: duplicate declare " + idToken);
+            semanticsErrors.add("Err: duplicate declare " + idToken);
+        }
         return visitChildren(ctx);
     }
 
