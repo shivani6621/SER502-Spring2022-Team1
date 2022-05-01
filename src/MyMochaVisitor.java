@@ -53,6 +53,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+
         String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
         if (!variable.containsKey(idToken)){
@@ -98,17 +99,10 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-//        System.out.println("expression op: " + ctx.children.get(1).getText());
-//        System.out.println("ctx.children.size(): " + ctx.children.size());
-//        System.out.println("ctx " + ctx.getText());
-//        if (ctx.children.size() != 3) {
-//            return visitChildren(ctx);
-//        }
         if (ctx.arithmetic_expression().size() < 2) {
             return visitChildren(ctx);
         }
         String op = ctx.children.get(1).getText();
-//        System.out.println("ctx " + ctx.getText());
         Double left = Double.valueOf(visit(ctx.arithmetic_expression(0)).toString()) ;
 
         Double right = Double.valueOf(visit(ctx.arithmetic_expression(1)).toString()) ;
@@ -148,15 +142,16 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
+        if (ctx.expression_term().size() < 2 && ctx.OP_LOGICAL_NOT() != null) {
+            return ! Boolean.valueOf(visit(ctx.expression_term(0)).toString());
+        }
         Boolean left = Boolean.valueOf(visit(ctx.expression_term(0)).toString()) ;
         Boolean right = Boolean.valueOf(visit(ctx.expression_term(1)).toString());
         String op = ctx.children.get(1).getText();
-        if (op.equals("and")) {
+        if (op.equals("&&")) {
             return left && right;
-        } else if (op.equals("or")) {
+        } else if (op.equals("||")) {
             return left || right;
-        }else if (op.equals("not")){
-            return left != right;
         }else{
             return null;
         }
@@ -165,8 +160,19 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
-
-        return visitChildren(ctx);
+        //Boolean expr = Boolean.valueOf(visit(ctx.relational_expression()));
+        Object expr= visit(ctx.relational_expression());
+        Object value1 = (visit(ctx.expression(1)).toString());
+        Object value2 = (visit(ctx.expression(2)).toString());
+        if((boolean)expr == true){
+            return value1;
+        }
+        else if((boolean)expr == false){
+            return value2;
+        }
+        else{
+            return null;
+        }
     }
 
 
@@ -194,6 +200,18 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
+//        if (ctx. != null) {
+//            Object left = visit(ctx.expression_term(0));
+//            Object right = visit(ctx.expression_term(1));
+//            if (ctx.OP_SET_LOGICAL_BIN().getText().equals("and")) {
+//                return (Boolean) left && (Boolean) right;
+//            } else {
+//                return (Boolean) left || (Boolean) right;
+//            }
+//        }
+//        if (ctx.OP_SET_LOGICAL_UNI() != null) {
+//            return !(Boolean) visit(ctx.expression_term(0));
+//        }
         return visitChildren(ctx);
     }
 
@@ -234,11 +252,25 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitPrint_statement(MochaParser.Print_statementContext ctx) {
-        return visitChildren(ctx);
+        visit(ctx.print_argument_list());
+        return null;
     }
 
     @Override
     public Object visitPrint_argument_list(MochaParser.Print_argument_listContext ctx) {
+        if (ctx.IDENTIFIER()!= null) {
+            String identifier =  ctx.IDENTIFIER().getText();
+            if (variable.containsKey(identifier)){
+                outputStream.println(variable.get(identifier).getValue());
+            }else
+                outputStream.println(identifier);
+        }else if (ctx.LITERAL()!= null){
+            outputStream.println(ctx.LITERAL().getText());
+        }else
+            semanticsErrors.add("can not print null ");
+        if (ctx.print_argument_list() != null) {
+            visit(ctx.print_argument_list());
+        }
         return visitChildren(ctx);
     }
 
@@ -247,8 +279,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             outputStream.println("Compiled successfully");
             printEnvironment();
         }else {
-            for (int i = 0; i <= semanticsErrors.size(); i++){
-                outputStream.println(semanticsErrors.get(i));
+            for (String semanticsError : semanticsErrors) {
+                outputStream.println(semanticsError);
             }
         }
     }

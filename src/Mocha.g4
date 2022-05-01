@@ -20,9 +20,9 @@ assignment_statement : IDENTIFIER OP_ASSIGN expression;
 
 /* EXPRESSION DEFINITION */
 expression
-    : arithmetic_expression
+    : logical_expression
+    | arithmetic_expression
     | relational_expression
-    | logical_expression
     | ternary_expression ;
 
 arithmetic_expression :
@@ -37,8 +37,8 @@ relational_expression : expression_term OP_SET_RELATIONAL expression_term ;
 
 /* LOGICAL EXPRESSION DEFINITION */
 logical_expression
-    : expression_term OP_SET_LOGICAL_BIN expression_term
-    | OP_SET_LOGICAL_UNI expression_term ;
+    : expression_term (OP_LOGICAL_AND | OP_LOGICAL_OR) expression_term
+    | OP_LOGICAL_NOT expression_term ;
 
 /* TERNARY EXPRESSION DEFINITION */
 ternary_expression : relational_expression OP_TERNARY_TRUE expression OP_TERNARY_FALSE expression ;
@@ -69,8 +69,7 @@ DATA_TYPE_FLOAT     : 'float';
 DATA_TYPE_BOOLEAN   : 'boolean';
 DATA_TYPE_STRING    : 'string';
 
-/* IDENTIFIER DEFINITION */
-IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
+
 
 /* LITERAL DEFINITION */
 LITERAL : INTEGER_LITERAL | FLOATING_POINT_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL ;
@@ -103,13 +102,12 @@ OP_SMALLER_EQUALS : '<=';
 OP_GREATER_EQUALS : '>=';
 
 /* LOGICAL OPERATOR DEFINITIONS */
-OP_SET_LOGICAL : OP_SET_LOGICAL_UNI | OP_SET_LOGICAL_BIN;
-OP_SET_LOGICAL_UNI : OP_LOGICAL_NOT;
-OP_SET_LOGICAL_BIN : OP_LOGICAL_AND | OP_LOGICAL_OR;
-OP_LOGICAL_AND : 'and';
-OP_LOGICAL_OR  : 'or';
-OP_LOGICAL_NOT : 'not';
+OP_LOGICAL_AND : '&&';
+OP_LOGICAL_OR  : '||';
+OP_LOGICAL_NOT : '!';
 
 /* TERNARY OPERATOR DEFINITIONS */
 OP_TERNARY_TRUE  : '?' ;
 OP_TERNARY_FALSE : ':' ;
+/* IDENTIFIER DEFINITION */
+IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
