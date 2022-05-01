@@ -10,9 +10,6 @@ public class Variable {
             default: throw new Exception("invalid data type");
         }
     }
-    public Variable(Object value) {
-        this.value = value;
-    }
 
     public Object getValue() {
         return this.value;

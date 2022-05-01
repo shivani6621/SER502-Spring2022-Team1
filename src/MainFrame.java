@@ -1,14 +1,14 @@
-import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class MainFrame extends JFrame {
     private static final int DEFAULT_WINDOW_HEIGHT = 500;
@@ -19,13 +19,22 @@ public class MainFrame extends JFrame {
     private final JTextArea jTextAreaProgramOutput;
 
     private final DefaultTableModel modelEnvironment;
-    private final JTable jTableEnvironment;
 
     public MainFrame(){
         super("Mocha");
 
         JPanel jPanelMainPanel = new JPanel();
         jPanelMainPanel.setLayout(new GridBagLayout());
+
+        JMenuBar menuBar  = new JMenuBar();
+        JMenu menuFile = new JMenu("Menu");
+
+        JMenuItem menuItemLoad = new JMenuItem("Load");
+        menuItemLoad.addActionListener(e -> loadFile());
+
+        menuFile.add(menuItemLoad);
+        menuBar.add(menuFile);
+        setJMenuBar(menuBar);
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -44,7 +53,7 @@ public class MainFrame extends JFrame {
         jPanelMainPanel.add(new JScrollPane(jTextAreaProgramOutput), c);
 
         modelEnvironment = new DefaultTableModel(new String[] { "Variable", "Type", "Value" }, 0);
-        jTableEnvironment = new JTable(modelEnvironment);
+        JTable jTableEnvironment = new JTable(modelEnvironment);
 
         c.gridx = 1; c.gridy = 2; c.gridwidth = 1; c.weightx = 3; c.weighty = 4;
         jPanelMainPanel.add(new JScrollPane(jTableEnvironment), c);
@@ -86,6 +95,24 @@ public class MainFrame extends JFrame {
         for (Map.Entry<String, Variable> variableEntry : myMochaVisitor.getVariableMap().entrySet()) {
             Variable variable = variableEntry.getValue();
             modelEnvironment.addRow(new Object[] { variableEntry.getKey(), variable.getType(), variable.getValue() });
+        }
+    }
+
+    private void loadFile() {
+        JFileChooser jFileChooser = new JFileChooser();
+        jFileChooser.setFileFilter(new FileNameExtensionFilter("Mocha Files | *.mocha; Text Files | *.txt", "txt", "mocha"));
+
+        if (jFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            jTextAreaCodeEditor.setText("");
+            String filePath = jFileChooser.getSelectedFile().getAbsolutePath();
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null)
+                    jTextAreaCodeEditor.append(line + "\n");
+            }
+            catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Failed to load file !");
+            }
         }
     }
 }
