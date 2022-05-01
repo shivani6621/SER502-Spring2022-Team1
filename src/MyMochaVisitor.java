@@ -254,12 +254,23 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitWhile_statement(MochaParser.While_statementContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.while_condition() == null) {
+            return null;
+        }
+        Object cond = visit(ctx.while_condition());
+        while ((boolean) cond){
+            visit(ctx.statement());
+        }
+        return null;
     }
 
     @Override
     public Object visitWhile_condition(MochaParser.While_conditionContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.relational_expression() != null) {
+            return visit(ctx.relational_expression());
+        } else {
+            return visit(ctx.logical_expression());
+        }
     }
 
     @Override
