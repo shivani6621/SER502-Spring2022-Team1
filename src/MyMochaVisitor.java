@@ -200,24 +200,28 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
-//        if (ctx. != null) {
-//            Object left = visit(ctx.expression_term(0));
-//            Object right = visit(ctx.expression_term(1));
-//            if (ctx.OP_SET_LOGICAL_BIN().getText().equals("and")) {
-//                return (Boolean) left && (Boolean) right;
-//            } else {
-//                return (Boolean) left || (Boolean) right;
-//            }
-//        }
-//        if (ctx.OP_SET_LOGICAL_UNI() != null) {
-//            return !(Boolean) visit(ctx.expression_term(0));
-//        }
-        return visitChildren(ctx);
+        if (ctx.if_condition() == null) {
+            return null;
+        }
+        System.out.println("if_else_statement" + ctx.getText());
+        Object cond = visit(ctx.if_condition());
+        if ((boolean)cond) {
+            visit(ctx.statement(0));
+        } else {
+            if (ctx.statement(1) != null) {
+                visit(ctx.statement(1));
+            }
+        }
+        return null;
     }
 
     @Override
     public Object visitIf_condition(MochaParser.If_conditionContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.relational_expression() != null) {
+            return visit(ctx.relational_expression());
+        } else {
+            return visit(ctx.logical_expression());
+        }
     }
 
     @Override
