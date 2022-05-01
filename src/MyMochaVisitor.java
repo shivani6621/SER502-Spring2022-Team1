@@ -53,6 +53,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitVariable_declaration(MochaParser.Variable_declarationContext ctx) {
+
         String data_type = ctx.DATA_TYPE().getText();
         String idToken = ctx.identifier_list().getText();
         if (!variable.containsKey(idToken)){
@@ -98,17 +99,10 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-//        System.out.println("expression op: " + ctx.children.get(1).getText());
-//        System.out.println("ctx.children.size(): " + ctx.children.size());
-//        System.out.println("ctx " + ctx.getText());
-//        if (ctx.children.size() != 3) {
-//            return visitChildren(ctx);
-//        }
         if (ctx.arithmetic_expression().size() < 2) {
             return visitChildren(ctx);
         }
         String op = ctx.children.get(1).getText();
-//        System.out.println("ctx " + ctx.getText());
         Double left = Double.valueOf(visit(ctx.arithmetic_expression(0)).toString()) ;
 
         Double right = Double.valueOf(visit(ctx.arithmetic_expression(1)).toString()) ;
@@ -194,7 +188,19 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitIf_else_statement(MochaParser.If_else_statementContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.OP_SET_LOGICAL_BIN() != null) {
+            Object left = visit(ctx.expression_term(0));
+            Object right = visit(ctx.expression_term(1));
+            if (ctx.OP_SET_LOGICAL_BIN().getText().equals("and")) {
+                return (Boolean) left && (Boolean) right;
+            } else {
+                return (Boolean) left || (Boolean) right;
+            }
+        }
+        if (ctx.OP_SET_LOGICAL_UNI() != null) {
+            return !(Boolean) visit(ctx.expression_term(0));
+        }
+        return null;
     }
 
     @Override
