@@ -1,0 +1,12 @@
+begin
+int x = 3, x1 = 2
+float y = 3.14
+string z = "hello"
+boolean a = true
+boolean b
+b= true && false
+boolean c
+c = true || false
+boolean d
+d = !true
+end
