@@ -128,8 +128,8 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
 
-        Double left = Double.valueOf(ctx.expression_term(0).getText());
-        Double right = Double.valueOf(ctx.expression_term(1).getText());
+        Double left = Double.valueOf(visit(ctx.expression_term(0)).toString()) ;
+        Double right = Double.valueOf(visit(ctx.expression_term(1)).toString());
         String op = ctx.children.get(1).getText();
         if (op.equals("<")) {
             return left < right;
@@ -158,7 +158,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitExpression_term(MochaParser.Expression_termContext ctx) {
-        String rtn;
+        Object rtn;
         if (ctx.IDENTIFIER() != null) {
             if (!variable.containsKey(ctx.IDENTIFIER().getText())) {
                 Token idToken = ctx.IDENTIFIER().getSymbol();
@@ -168,9 +168,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 outputStream.println("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
                 semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " is not declared" );
             }
-            rtn = ctx.IDENTIFIER().getText();
+            String name = ctx.IDENTIFIER().getText();
+            rtn = variable.get(name).getValue();
+
         } else {
-            rtn = ctx.LITERAL().getText();
+            rtn = ctx.LITERAL();
         }
         System.out.println("expression term: " + rtn);
         return rtn;
