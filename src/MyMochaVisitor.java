@@ -79,8 +79,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
-    @Override
-    public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
+    @Override public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
         if (ctx.arithmetic_expression().size() < 2)
             return visitChildren(ctx);
 
@@ -129,53 +128,66 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return null;
     }
 
-    @Override
-    public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
-        if (ctx.expression_term().size() < 2) {
+    @Override public Object visitRelational_expression(MochaParser.Relational_expressionContext ctx) {
+        if (ctx.expression_term().size() < 2)
             return visitChildren(ctx);
+
+        Object leftOperand = visit(ctx.expression_term(0));
+        Object rightOperand = visit(ctx.expression_term(1));
+
+        TerminalNode operatorNode = ctx.OP_EQUALS() != null ? ctx.OP_EQUALS()
+                : ctx.OP_GREATER() != null ? ctx.OP_GREATER()
+                : ctx.OP_SMALLER() != null ? ctx.OP_SMALLER()
+                : ctx.OP_GREATER_EQUALS() != null ? ctx.OP_GREATER_EQUALS()
+                : ctx.OP_SMALLER_EQUALS();
+        Token operatorToken = operatorNode.getSymbol();
+        String operator = operatorNode.getText();
+
+        if ((leftOperand instanceof Integer || leftOperand instanceof Double) &&
+                (rightOperand instanceof Integer || rightOperand instanceof Double)) {
+
+            double leftOperandDouble = leftOperand instanceof Double ? (Double)leftOperand : ((Integer)leftOperand).doubleValue();
+            double rightOperandDouble = rightOperand instanceof Double ? (Double)rightOperand : ((Integer)rightOperand).doubleValue();
+
+            if (operator.equals("<")) return leftOperandDouble < rightOperandDouble;
+            else if (operator.equals(">"))return leftOperandDouble > rightOperandDouble;
+            else if (operator.equals("<=")) return leftOperandDouble <= rightOperandDouble;
+            else if (operator.equals(">=")) return leftOperandDouble >= rightOperandDouble;
+            else if (operator.equals("==")) return leftOperandDouble == rightOperandDouble;
+        } else {
+            semanticErrorList.add(new SemanticError("unsupported operands in relational expression",
+                    operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
         }
-        Double left = Double.valueOf(visit(ctx.expression_term(0)).toString()) ;
-        Double right = Double.valueOf(visit(ctx.expression_term(1)).toString());
-        String op = ctx.children.get(1).getText();
-        if (op.equals("<")) {
-            return left < right;
-        } else if (op.equals(">")) {
-            return left > right;
-        } else if (op.equals("<=")) {
-            return left <= right;
-        } else if (op.equals(">=")) {
-            return left >= right;
-        } else if (op.equals("==")) {
-            return left.equals(right);
-        }else {
-            return null;
-        }
+        return null;
     }
 
-    @Override
-    public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
-        if (ctx.OP_LOGICAL_NOT() != null) {
-            return ! Boolean.valueOf(visit(ctx.expression_term(0)).toString());
-        } else if (ctx.expression_term().size() == 1) {
+    @Override public Object visitLogical_expression(MochaParser.Logical_expressionContext ctx) {
+        if (ctx.OP_LOGICAL_NOT() != null)
+            return ! ((Boolean) visit(ctx.expression_term(0)));
+
+        if (ctx.expression_term().size() == 1)
             return visit(ctx.expression_term(0));
-        }
 
-        Boolean left = Boolean.valueOf(visit(ctx.expression_term(0)).toString()) ;
-        Boolean right = Boolean.valueOf(visit(ctx.expression_term(1)).toString());
-        String op = ctx.children.get(1).getText();
-        if (op.equals("&&")) {
-            return left && right;
-        } else if (op.equals("||")) {
-            return left || right;
-        }else{
-            return null;
-        }
+        Object leftOperand = visit(ctx.expression_term(0));
+        Object rightOperand = visit(ctx.expression_term(1));
 
+        TerminalNode operatorNode = ctx.OP_LOGICAL_AND() != null ? ctx.OP_LOGICAL_AND() : ctx.OP_LOGICAL_OR();
+        Token operatorToken = operatorNode.getSymbol();
+        String operator = operatorNode.getText();
+
+        if (leftOperand instanceof Boolean && rightOperand instanceof Boolean) {
+            if (operator.equals("&&")) return (Boolean)leftOperand && (Boolean)rightOperand;
+            else if (operator.equals("||")) return (Boolean)leftOperand || (Boolean)rightOperand;
+        } else {
+            semanticErrorList.add(new SemanticError("unsupported operands in logical expression",
+                    operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
+        }
+        return null;
     }
 
     @Override
     public Object visitTernary_expression(MochaParser.Ternary_expressionContext ctx) {
-        Object expr= visit(ctx.relational_expression());
+        Object expr = visit(ctx.relational_expression());
         Object value1 = visit(ctx.expression(0));
         Object value2 = visit(ctx.expression(1));
         if((boolean)expr == true){
