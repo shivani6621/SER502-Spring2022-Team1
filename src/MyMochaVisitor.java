@@ -223,6 +223,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     @Override
     public Object visitFor_statement(MochaParser.For_statementContext ctx) {
         String var = ctx.for_expression().IDENTIFIER().getText();
+        if (variable.containsKey(var)) {
+            Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
+            int line = idToken.getLine();
+            int column = idToken.getCharPositionInLine() + 1;
+            String id = ctx.for_expression().IDENTIFIER().getText();
+            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
+            return null;
+        }
         int start = Integer.parseInt(ctx.for_expression().LITERAL(0).getText());
         int end = Integer.parseInt(ctx.for_expression().LITERAL(1).getText());
         Var var1 = new Var("int");
@@ -253,7 +261,26 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     @Override
     public Object visitFor_in_range_statement(MochaParser.For_in_range_statementContext ctx) {
-        return visitChildren(ctx);
+        String var = ctx.IDENTIFIER().getText();
+        if (variable.containsKey(var)) {
+            Token idToken = ctx.IDENTIFIER().getSymbol();
+            int line = idToken.getLine();
+            int column = idToken.getCharPositionInLine() + 1;
+            String id = ctx.IDENTIFIER().getText();
+            semanticsErrors.add("Err: Variable " + id + " at line " + line + " column " + column + " has been declared" );
+            return null;
+        }
+        int start = Integer.parseInt(ctx.range().LITERAL(0).getText());
+        int end = Integer.parseInt(ctx.range().LITERAL(1).getText());
+        Var var1 = new Var("int");
+        var1.setValue(start);
+        variable.put(var, var1);
+        for (int i = start; i < end; i++) {
+            variable.get(var).setValue(i);
+            visit(ctx.statement());
+        }
+        variable.remove(var);
+        return null;
     }
 
     @Override
