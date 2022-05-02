@@ -8,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class MainFrame extends JFrame {
     private static final int DEFAULT_WINDOW_HEIGHT = 500;
@@ -81,20 +80,27 @@ public class MainFrame extends JFrame {
         jTextAreaProgramOutput.setText("");
         modelEnvironment.setRowCount(0);
 
+        PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
+
         MochaLexer mochaLexer = new MochaLexer(CharStreams.fromString(jTextAreaCodeEditor.getText()));
         CommonTokenStream commonTokenStream = new CommonTokenStream(mochaLexer);
         MochaParser mochaParser = new MochaParser(commonTokenStream);
+        MyMochaErrorListener myMochaErrorListener = new MyMochaErrorListener(programOutputPrintStream);
+        mochaParser.removeErrorListeners();
+        mochaParser.addErrorListener(myMochaErrorListener);
+
         ParseTree parseTree = mochaParser.program();
-        jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\n");
+        if (myMochaErrorListener.parseResult()) {
+            jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\n");
 
-        PrintStream programOutputPrintStream = new PrintStream(new TextAreaOutputStream(jTextAreaProgramOutput));
-        MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
-        myMochaVisitor.visit(parseTree);
+            MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
+            myMochaVisitor.visit(parseTree);
 
-        myMochaVisitor.printEvaluationResults();
-        for (Map.Entry<String, Variable> variableEntry : myMochaVisitor.getVariableMap().entrySet()) {
-            Variable variable = variableEntry.getValue();
-            modelEnvironment.addRow(new Object[] { variableEntry.getKey(), variable.getType(), variable.getValue() });
+            myMochaVisitor.evaluationResult();
+            for (Map.Entry<String, Variable> variableEntry : myMochaVisitor.getVariableMap().entrySet()) {
+                Variable variable = variableEntry.getValue();
+                modelEnvironment.addRow(new Object[] { variableEntry.getKey(), variable.getType(), variable.getValue() });
+            }
         }
     }
 

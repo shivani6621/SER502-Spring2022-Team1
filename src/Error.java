@@ -1,10 +1,10 @@
-public class SemanticError {
+public class Error {
 
     private final String message;
     private final int lineNo;
     private final int position;
 
-    public SemanticError(String message, int lineNo, int position) {
+    public Error(String message, int lineNo, int position) {
         this.message = message;
         this.lineNo = lineNo;
         this.position = position;

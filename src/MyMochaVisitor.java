@@ -10,7 +10,7 @@ import java.util.Map;
 public class MyMochaVisitor extends MochaBaseVisitor<Object> {
 
     private final PrintStream outputStream;
-    private final List<SemanticError> semanticErrorList;
+    private final List<Error> semanticErrorList;
     private final Map<String, Variable> variableMap;
 
     public MyMochaVisitor(PrintStream outputStream) {
@@ -47,11 +47,11 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                     variable.setValue(visit(ctx.literal()));
                 variableMap.put(identifier, variable);
             } catch (Exception ex) {
-                semanticErrorList.add(new SemanticError(String.format("variable '%s' initialization failed: %s",
+                semanticErrorList.add(new Error(String.format("variable '%s' initialization failed: %s",
                         identifier, ex.getMessage()), idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         } else {
-            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+            semanticErrorList.add(new Error(String.format("variable '%s' is previously declared", identifier),
                     idToken.getLine(), idToken.getCharPositionInLine() + 1));
         }
         return visitChildren(ctx);
@@ -61,14 +61,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         Token idToken = ctx.IDENTIFIER().getSymbol();
         String identifier = ctx.IDENTIFIER().getText();
         if (!variableMap.containsKey(identifier)) {
-            semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+            semanticErrorList.add(new Error(String.format("variable '%s' is not declared", identifier),
                     idToken.getLine(), idToken.getCharPositionInLine() + 1));
         } else {
             try {
                 Object value = visit(ctx.expression());
                 variableMap.get(identifier).setValue(value);
             } catch (Exception ex) {
-                semanticErrorList.add(new SemanticError(String.format("variable '%s' cannot be assigned to RHS: %s",
+                semanticErrorList.add(new Error(String.format("variable '%s' cannot be assigned to RHS: %s",
                         identifier, ex.getMessage()), idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         }
@@ -105,7 +105,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 else if (operator.equals("*")) return leftOperandInt * rightOperandInt;
                 else if (operator.equals("/")) {
                     if (rightOperandInt != 0) return leftOperandInt / rightOperandInt;
-                    else semanticErrorList.add(new SemanticError("divide by zero", operatorToken.getLine(),
+                    else semanticErrorList.add(new Error("divide by zero", operatorToken.getLine(),
                             operatorToken.getCharPositionInLine() + 1));
                 }
             } else { // FLOATING POINT ARITHMETIC
@@ -117,12 +117,12 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
                 else if (operator.equals("*")) return leftOperandDouble * rightOperandDouble;
                 else if (operator.equals("/")) {
                     if (rightOperandDouble != 0.0) return leftOperandDouble / rightOperandDouble;
-                    else semanticErrorList.add(new SemanticError("divide by zero",  operatorToken.getLine(),
+                    else semanticErrorList.add(new Error("divide by zero",  operatorToken.getLine(),
                             operatorToken.getCharPositionInLine() + 1));
                 }
             }
         } else {
-            semanticErrorList.add(new SemanticError("unsupported operands in arithmetic expression",
+            semanticErrorList.add(new Error("unsupported operands in arithmetic expression",
                     operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
         }
         return null;
@@ -155,7 +155,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             else if (operator.equals(">=")) return leftOperandDouble >= rightOperandDouble;
             else if (operator.equals("==")) return leftOperandDouble == rightOperandDouble;
         } else {
-            semanticErrorList.add(new SemanticError("unsupported operands in relational expression",
+            semanticErrorList.add(new Error("unsupported operands in relational expression",
                     operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
         }
         return null;
@@ -179,7 +179,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             if (operator.equals("&&")) return (Boolean)leftOperand && (Boolean)rightOperand;
             else if (operator.equals("||")) return (Boolean)leftOperand || (Boolean)rightOperand;
         } else {
-            semanticErrorList.add(new SemanticError("unsupported operands in logical expression",
+            semanticErrorList.add(new Error("unsupported operands in logical expression",
                     operatorToken.getLine(), operatorToken.getCharPositionInLine() + 1));
         }
         return null;
@@ -199,7 +199,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             Token idToken = ctx.IDENTIFIER().getSymbol();
             String identifier = ctx.IDENTIFIER().getText();
             if (!variableMap.containsKey(ctx.IDENTIFIER().getText())) {
-                semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+                semanticErrorList.add(new Error(String.format("variable '%s' is not declared", identifier),
                         idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
             return variableMap.get(identifier).getValue();
@@ -224,7 +224,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         Token idToken = ctx.for_expression().IDENTIFIER().getSymbol();
         String identifier = ctx.for_expression().IDENTIFIER().getText();
         if (variableMap.containsKey(identifier)) {
-            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+            semanticErrorList.add(new Error(String.format("variable '%s' is previously declared", identifier),
                     idToken.getLine(), idToken.getCharPositionInLine() + 1));
             return null;
         }
@@ -270,7 +270,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         Token idToken = ctx.IDENTIFIER().getSymbol();
         String identifier = ctx.IDENTIFIER().getText();
         if (variableMap.containsKey(identifier)) {
-            semanticErrorList.add(new SemanticError(String.format("variable '%s' is previously declared", identifier),
+            semanticErrorList.add(new Error(String.format("variable '%s' is previously declared", identifier),
                     idToken.getLine(), idToken.getCharPositionInLine() + 1));
             return null;
         }
@@ -311,7 +311,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             if (variableMap.containsKey(identifier)) {
                 printBuffer.append(variableMap.get(identifier).getValue());
             } else {
-                semanticErrorList.add(new SemanticError(String.format("variable '%s' is not declared", identifier),
+                semanticErrorList.add(new Error(String.format("variable '%s' is not declared", identifier),
                         idToken.getLine(), idToken.getCharPositionInLine() + 1));
             }
         } else if (ctx.literal() != null) {
@@ -332,14 +332,14 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
-    public void printEvaluationResults() {
+    public void evaluationResult() {
         if (semanticErrorList.size() == 0) {
             outputStream.println("Program Evaluation Successful.");
             outputStream.println(printBuffer);
         } else {
             outputStream.println("Program Evaluation Failed. Please Correct The Following Errors:");
-            for (SemanticError semanticsError : semanticErrorList)
-                outputStream.println(semanticsError);
+            for (Error semanticError : semanticErrorList)
+                outputStream.println(semanticError);
         }
     }
 
