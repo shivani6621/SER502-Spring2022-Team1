@@ -91,7 +91,7 @@ public class MainFrame extends JFrame {
 
         ParseTree parseTree = mochaParser.program();
         if (myMochaErrorListener.parseResult()) {
-            jTextAreaProgramOutput.setText("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\n");
+            jTextAreaProgramOutput.append("Parse Tree:\n" + parseTree.toStringTree(mochaParser) + "\n\n");
 
             MyMochaVisitor myMochaVisitor = new MyMochaVisitor(programOutputPrintStream);
             myMochaVisitor.visit(parseTree);

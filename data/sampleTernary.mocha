@@ -1,0 +1,6 @@
+begin
+	int x, y, z
+	boolean flag = false;
+	x = flag ? 1 : 2
+	if flag { y = 10 } else { z = 10 }
+end

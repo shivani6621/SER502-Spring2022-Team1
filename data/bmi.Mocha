@@ -1,16 +1,12 @@
 begin
-float weight = 80.4
-float height = 160.3
-float bmi
-weight = weight * 100 * 100
-height = height * height
-bmi = weight/height
-if ( bmi > 30 )
-{
-print "You are overweight"
-}
-else
-{
-print "You are normal"
-}
+	float weight = 80.4, height = 160.3
+	float bmi
+	weight = weight * 100 * 100
+	height = height * height
+	bmi = weight / height
+	if bmi > 30 {
+		print "You are overweight"
+	} else {
+		print "You are normal"
+	}
 end
