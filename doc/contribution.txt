@@ -47,3 +47,7 @@ Zhuoran Li:
 2. Worked on implementing the for evaluator
 3. Development of the GUI
 4. Wrote running samples
+
+Shivani Patil:
+1. Worked on the presentation 
+2. Tried working on MyMochaVisit class to implement the expression semantics. (faced technical issues)
