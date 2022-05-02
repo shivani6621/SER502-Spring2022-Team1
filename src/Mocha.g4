@@ -12,8 +12,8 @@ statement
     | print_statement ;
 
 /* VARIABLE DECLARATION DEFINITION */
-variable_declaration : DATA_TYPE identifier_list ;
-identifier_list : IDENTIFIER (OP_ASSIGN LITERAL)? (',' identifier_list)? ;
+variable_declaration : data_type identifier_list ;
+identifier_list : IDENTIFIER (OP_ASSIGN literal)? (',' identifier_list)? ;
 
 /* ASSIGNMENT STATEMENT DEFINITION */
 assignment_statement : IDENTIFIER OP_ASSIGN expression;
@@ -33,37 +33,41 @@ arithmetic_expression :
         ;
 
 /* RELATIONAL EXPRESSION DEFINITION */
-relational_expression : expression_term OP_SET_RELATIONAL expression_term ;
+relational_expression : expression_term (OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS) expression_term
+    | expression_term;
 
 /* LOGICAL EXPRESSION DEFINITION */
 logical_expression
     : expression_term (OP_LOGICAL_AND | OP_LOGICAL_OR) expression_term
-    | OP_LOGICAL_NOT expression_term ;
+    | OP_LOGICAL_NOT expression_term
+    | expression_term;
 
 /* TERNARY EXPRESSION DEFINITION */
 ternary_expression : relational_expression OP_TERNARY_TRUE expression OP_TERNARY_FALSE expression ;
 
-expression_term : IDENTIFIER | LITERAL ;
+expression_term : IDENTIFIER | literal | BOOLEAN_FALSE | BOOLEAN_TRUE;
 
-if_else_statement : 'if' if_condition '{' statement '}' ('else' '{' statement '}')? ;
+if_else_statement : 'if' if_condition '{' body '}' ('else' '{' body '}')? ;
 if_condition: relational_expression | logical_expression ;
 
-for_statement : 'for' for_expression '{' statement '}' ;
+for_statement : 'for' for_expression '{' body '}' ;
 for_expression : IDENTIFIER OP_ASSIGN INTEGER_LITERAL 'to' INTEGER_LITERAL ;
 
-while_statement: 'while' while_condition '{' statement '}' ;
+while_statement: 'while' while_condition '{' body '}' ;
 while_condition: relational_expression | logical_expression ;
 
-for_in_range_statement: 'for' IDENTIFIER 'in' range '{' statement '}' ;
+for_in_range_statement: 'for' IDENTIFIER 'in' range '{' body '}' ;
 range : INTEGER_LITERAL ',' INTEGER_LITERAL ;
 
 print_statement: 'print' print_argument_list ;
 print_argument_list
-    : LITERAL (',' print_argument_list)?
+    : literal (',' print_argument_list)?
     | IDENTIFIER (',' print_argument_list)? ;
 
+literal : INTEGER_LITERAL | FLOATING_POINT_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL ;
 /* DATA TYPE DEFINITIONS */
-DATA_TYPE : DATA_TYPE_INT | DATA_TYPE_FLOAT | DATA_TYPE_BOOLEAN | DATA_TYPE_STRING;
+data_type : DATA_TYPE_INT | DATA_TYPE_FLOAT | DATA_TYPE_BOOLEAN | DATA_TYPE_STRING;
+
 DATA_TYPE_INT       : 'int';
 DATA_TYPE_FLOAT     : 'float';
 DATA_TYPE_BOOLEAN   : 'boolean';
@@ -72,11 +76,13 @@ DATA_TYPE_STRING    : 'string';
 
 
 /* LITERAL DEFINITION */
-LITERAL : INTEGER_LITERAL | FLOATING_POINT_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL ;
+
 INTEGER_LITERAL : [+-]? [0-9] | [+-]? [1-9][0-9]+ ;
 FLOATING_POINT_LITERAL : INTEGER_LITERAL '.' [0-9]+ ;
 BOOLEAN_LITERAL : BOOLEAN_TRUE | BOOLEAN_FALSE ;
 STRING_LITERAL : '"' .*? '"' ;
+//LITERAL : INTEGER_LITERAL | FLOATING_POINT_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL ;
+
 
 BOOLEAN_TRUE : 'true' ;
 BOOLEAN_FALSE : 'false' ;
@@ -94,7 +100,7 @@ OP_MUL : '*';
 OP_DIV : '/';
 
 /* RELATIONAL OPERATOR DEFINITIONS */
-OP_SET_RELATIONAL : OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS;
+//OP_SET_RELATIONAL : OP_EQUALS | OP_SMALLER | OP_GREATER | OP_SMALLER_EQUALS | OP_GREATER_EQUALS;
 OP_EQUALS : '==';
 OP_SMALLER : '<';
 OP_GREATER : '>';

@@ -1,27 +1,43 @@
 public class Variable {
-    enum TYPE { UNDEFINED, INTEGER, DOUBLE, BOOLEAN, STRING };
-
     private Object value;
 
-    public Variable(Object value) {
-        this.value = value;
+    public Variable(String dataType) throws Exception {
+        switch (dataType) {
+            case "int": value = 0; break;
+            case "float": value = 0.0; break;
+            case "boolean": value = false; break;
+            case "string": value = ""; break;
+            default: throw new Exception("invalid data type");
+        }
     }
 
-    public Object getDataValue() {
+    public Object getValue() {
         return this.value;
     }
-    public void setDataValue(Object newValue) throws Exception {
+    public void setValue(String newValue) {
+        switch (getType()) {
+            case "int" : value = Integer.parseInt(newValue); break;
+            case "float" : value = Double.parseDouble(newValue); break;
+            case "boolean" : value = Boolean.parseBoolean(newValue); break;
+            case "string" : value = newValue; break;
+        }
+    }
+    public void setValue(Object newValue) throws Exception {
         if (newValue.getClass().equals(value.getClass()))
             this.value = newValue;
-        else throw new Exception("Incompatible Type");
+        else if (newValue.getClass().equals(Integer.class) && value.getClass().equals(Double.class))
+            this.value = ((Integer) newValue).doubleValue();
+        else if (newValue.getClass().equals(Double.class) && value.getClass().equals(Integer.class))
+            this.value = ((Double) newValue).intValue();
+        else throw new Exception("incompatible type");
     }
 
-    public TYPE getDataType() {
-        if (value instanceof Integer) return TYPE.INTEGER;
-        else if (value instanceof Double) return TYPE.DOUBLE;
-        else if (value instanceof Boolean) return TYPE.BOOLEAN;
-        else if (value instanceof String) return TYPE.STRING;
-        else return TYPE.UNDEFINED;
+    public String getType() {
+        if (value instanceof Integer) return "int";
+        else if (value instanceof Double) return "float";
+        else if (value instanceof Boolean) return "boolean";
+        else if (value instanceof String) return "string";
+        else return null;
     }
 
     public int getInteger() {
@@ -43,12 +59,11 @@ public class Variable {
         if (this == object) return true;
 
         if (this.getClass().equals(object.getClass())) {
-            TYPE dataType = this.getDataType();
-            switch (dataType) {
-                case INTEGER : return this.getInteger() == ((Variable) object).getInteger();
-                case DOUBLE : return this.getDouble() == ((Variable) object).getDouble();
-                case BOOLEAN : return this.getBoolean() == ((Variable) object).getBoolean();
-                case STRING : return this.getString().equals(((Variable) object).getString());
+            switch (getType()) {
+                case "int" : return this.getInteger() == ((Variable) object).getInteger();
+                case "float" : return this.getDouble() == ((Variable) object).getDouble();
+                case "boolean" : return this.getBoolean() == ((Variable) object).getBoolean();
+                case "string" : return this.getString().equals(((Variable) object).getString());
             }
         }
         return false;

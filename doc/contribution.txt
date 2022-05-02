@@ -27,6 +27,7 @@ Shivani Patil:
 ---------------------------------------------------
 MILESTONE 2:
 ---------------------------------------------------
-Zuha Shireen Ansari
-1. Worked on the Logical and Ternary Expression.
-2. Prepared the presentation slides(slide 7-21).
+
+Zuha Shireen:
+1. Worked on the Logical and Ternary expression semantics.
+2. Prepared the presentation slides(From slide 7 to 21).

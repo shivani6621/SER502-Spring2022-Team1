@@ -226,4 +226,24 @@ public interface MochaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrint_argument_list(MochaParser.Print_argument_listContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MochaParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(MochaParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MochaParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(MochaParser.LiteralContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MochaParser#data_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterData_type(MochaParser.Data_typeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MochaParser#data_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitData_type(MochaParser.Data_typeContext ctx);
 }

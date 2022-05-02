@@ -274,6 +274,30 @@ public class MochaBaseListener implements MochaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrint_argument_list(MochaParser.Print_argument_listContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteral(MochaParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteral(MochaParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterData_type(MochaParser.Data_typeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitData_type(MochaParser.Data_typeContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
