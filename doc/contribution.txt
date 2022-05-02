@@ -36,3 +36,14 @@ Rishav Kumar:
 1. Worked on developing the grammar rules in ANTLR
 2. Development of the GUI
 3. Contributed to the development of the evaluator, precisely in trapping the semantic errors and reviewing the code and fixing bugs
+
+Shengdong Chen:
+1. Worked on implementing assignment evalueator, while loop evaluator, for loop evaluator, if-else evaluator
+2. Worked on updating the grammar rules to be more specific
+3. Wrote running samples
+
+Zhuoran Li:
+1. Worked on implementing the declaration evaluator
+2. Worked on implementing the for evaluator
+3. Development of the GUI
+4. Wrote running samples
