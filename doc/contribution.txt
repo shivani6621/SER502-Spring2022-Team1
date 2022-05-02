@@ -23,3 +23,11 @@ Shivani Patil:
 1. Setting up the Git-hub repository.
 2. Designed grammar for "if-else" construct.
 3. Worked on the documentation of Interpreter generation tool (ANTLR) that we are using.
+
+---------------------------------------------------
+MILESTONE 2:
+---------------------------------------------------
+
+Zuha Shireen:
+1. Worked on the Logical and Ternary expression semantics.
+2. Prepared the presentation slides(From slide 7 to 21).
