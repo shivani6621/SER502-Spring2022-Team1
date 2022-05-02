@@ -1,7 +1,7 @@
 # MOCHA - SER502 Project [Spring 2022 Team1]
 
 <p>
-  <img align="left" src="https://user-images.githubusercontent.com/89811541/166202533-dc467418-9624-4a73-91e2-dad5f314af43.png" width="350">
+  <img align="left" src="https://user-images.githubusercontent.com/89811541/166202533-dc467418-9624-4a73-91e2-dad5f314af43.png" width="400">
 </p>
 
 ## Introduction
