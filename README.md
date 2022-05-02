@@ -14,6 +14,6 @@ ANTLR4
 <br clear="left"/>
 
 ## Installation
-
+java -jar SER502-Spring2022-Team1.jar
 ## Video link
 https://youtu.be/OanuKN0jfpo
