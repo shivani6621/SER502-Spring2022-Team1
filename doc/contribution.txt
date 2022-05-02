@@ -36,3 +36,8 @@ Rishav Kumar:
 1. Worked on developing the grammar rules in ANTLR
 2. Development of the GUI
 3. Contributed to the development of the evaluator, precisely in trapping the semantic errors and reviewing the code and fixing bugs
+
+Shivani Patil:
+1. Worked on the presentation 
+2. Tried working on MyMochaVisit class to implement the expression semantics. (faced technical issues)
+
