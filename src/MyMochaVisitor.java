@@ -80,8 +80,10 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
     }
 
     @Override public Object visitArithmetic_expression(MochaParser.Arithmetic_expressionContext ctx) {
-        if (ctx.arithmetic_expression().size() < 2)
+        if (ctx.arithmetic_expression().size() == 0)
             return visitChildren(ctx);
+        else if (ctx.arithmetic_expression().size() == 1)
+            return visit(ctx.arithmetic_expression(0));
 
         Object leftOperand = visit(ctx.arithmetic_expression(0));
         Object rightOperand = visit(ctx.arithmetic_expression(1));
@@ -237,7 +239,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             variable.setValue(start);
             variableMap.put(identifier, variable);
 
-            for (int i = start; i < end; i++) {
+            for (int i = start; i <= end; i++) {
                 variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
@@ -283,7 +285,7 @@ public class MyMochaVisitor extends MochaBaseVisitor<Object> {
             variable.setValue(start);
             variableMap.put(identifier, variable);
 
-            for (int i = start; i < end; i++) {
+            for (int i = start; i <= end; i++) {
                 variableMap.get(identifier).setValue(i);
                 visit(ctx.body());
             }
